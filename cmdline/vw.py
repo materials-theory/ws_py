@@ -5,7 +5,6 @@ import os
 import sys
 import numpy as np
 
-# installpath = '/Users/Woosun/Documents/My_Documents/programs/executable/ws_py'
 installpath = '/Users/Woosun/Dropbox/Dev/ws_py'
 sys.path.extend([installpath])
 

@@ -15,6 +15,8 @@ Based on python 3, and have external dependencies on the following packages:
 
 Due to its home-development environment (in OS X), all shebangs and $PATHS must be set manually in order to use it properly.
 
+Especially, one might need to change **installpath** in `cmdline/vw.py`
+
 All plotting functions are based on Igor Pro (https://www.wavemetrics.com/products/igorpro/igorpro.htm), so one might need to modify plotting functions to use other plotting programs such as gnuplot or matplotlib.
 
 License and disclaimers
