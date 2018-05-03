@@ -517,7 +517,6 @@ class Plotter(object):
 
             graphpreset(out, None, None, None, None, 255.118, 340.157)
 
-    # TODO : Drude term corrector function
 
     def plotdielectric(self, direction, toplot, drude, plasmasq, tau):
         from Parsers import xmlParserV as xml
@@ -533,7 +532,7 @@ class Plotter(object):
         out = self.io.WriteFile()
 
         if toplot is None:
-            toplot = ['eI']
+            toplot = 'eI'
         else:
             pass
 

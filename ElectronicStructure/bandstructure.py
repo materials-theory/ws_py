@@ -133,7 +133,7 @@ class Bandstructure(object):
         return path, band, k_vec, numband
 
     def projectedband_data(self, fermi, fakeweight, shift, spin, atom, orbital):
-        dic = Procar().as_dict()
+        dic = Procar(None, spin).as_dict()
 
         numbands = dic['numbands']
         numkps = dic['numkps']
@@ -150,13 +150,12 @@ class Bandstructure(object):
         numkp = 0
 
         atomnum = []
-
         if atom is not None:
             for x in atom:
                 tmp = []
                 tmp2 = []
                 if '-' in x:
-                    for y in range(int(x.split('-')[0]) - 1, int(x.split('-')[1])):
+                    for y in range(int(x.split('-')[0]), int(x.split('-')[1])):
                         tmp.append(y)
                     atomnum.append(tmp)
                 else:
@@ -202,7 +201,7 @@ class Bandstructure(object):
         # Extra shifting of vbm only if it is turned on
         if shift is True:
             self.bandedge(fermi_e)
-            band -= self.vbm
+            band -= self.vbm[2]
         else:
             band -= fermi_e
 
