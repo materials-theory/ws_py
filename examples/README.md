@@ -1,6 +1,6 @@
 Example set
 ========
-Simplest set of examples/tutorials for new users.
+Simple set of examples/tutorials for new users.
 
 Pre-generated VASP input/output files are included in each folders.
 
@@ -11,18 +11,81 @@ poly
 ----
 Tool for handling the polyhedron-related structures and their analysis.
 
-* Measuring intra-octahedral distortions in MoO3
+* Measuring intra-octahedral distortions of MoO<sub>3</sub> (/examples/poly)
 
 `vw.py poly -c Mo -v O -i MoO3.vasp`
 
 Octahedral center atom (Mo) and vertex atom (O) must be set by -c and -v option.
 
-* Measuring inter-octahedral distortions (tilt angle analysis) in MoO3
+* Measuring inter-octahedral distortions (tilt angle analysis) of MoO<sub>3</sub> (/examples/poly)
 
 `vw.py poly -c Mo -v O -i MoO3.vasp -t -s`
 
 Toggled on tilt angle analysis by -t tag and turned on -s silent option to store results at polyresult.csv
 
+plot
+----
+Tool for plotting (in Igor Pro compatible *.itx file formats).
+
+* Plotting normal bandstructure of Si bulk (/examples/plot/0_band_normal)
+
+`vw.py plot band -g -s`
+
+High-symmetry point guide line is toggled on by -g tag, and VBM is shifted to 0 eV by -s tag.
+
+* Plotting fake-weight bandstructure (e.g. HSE06 calculations) of Si bulk (/examples/plot/1_band_fake_weight)
+
+`vw.py plot band -g -s -fake`
+
+* Plotting density-of-states of Si bulk (/examples/plot/2_dos)
+
+`vw.py plot dos -c`
+
+In order to generate only one .itx file, -c tag is used. Otherwise, it will be seperated out into a number of *.itx files.
+
+* Plotting dielectric function of Si bulk (/examples/plot/3_dielectric)
+
+`vw.py plot diel -p eI eR`
+
+Plotting imaginary (eI) and real (eR) part of dielectric function. Other available plotting options are: n, k, alpha, ELS, R, T, and A.
+
+* Plotting direction-dependent dielectric function of MoS<sub>2</sub> (/examples/plot/4_dielectric_direction)
+
+`vw.py plot diel -p eI eR -d`
+
+If one want to separate out the direction-dependent values (i.e. transversal and longitudinal), -d tag can be used.
+
+* Plotting dielectric function of Al bulk with Drude term correction (/examples/plot/5_dielectric_drude)
+
+`vw.py plot diel -D -P 65.341`
+
+Plasma frequency squared value can be obtained from the OUTCAR file. 
+
+* Plotting (orbital-, atom-)projected bandstructure of Sb<sub>2</sub>Te<sub>3</sub> (/examples/plot/6_pband)
+
+`vw.py plot pband -g -s -orb`
+
+Provides the orbital-projected bandstructure (s, p, d, and total).
+
+`vw.py plot pband -g -s -atom 0-7` 
+
+Provides the atom-projected bandstructure of Sb. Please be aware of python-style numbering -- the number starts from 0, not 1.
+
+Multiple atoms can be plotted at once, by using -atom tag like `-atom 0 9`, and `-atom 0-7 8-19`.
+
+Also note that -orb and -atom option can be used simultaneously. 
+
+* Plotting spin-projected bandstructure of graphene (/examples/plot/7_pband_spin)
+
+`vw.py plot pband -g -s -spin`
+
+Red color is set for + occupation, while blue color is set for - occupation in default.
+
+* Plotting temperature-broadened bandstructure with statistical models.
+
+
+
+**Every plotting presets (e.g. style, layout, color scale, ...) can be manually adjusted by modifying `Plotter/plotter.py` and modules therein.**
 
 elec
 ----
@@ -46,104 +109,6 @@ Provided band gap value is the result of sampling through the k-grid used in VAS
 
 Carrier effective mass is based on the parabolic E-k relationship, and the convergence test with respect to the grid density near the band edges, and the number of point stencil used, is necessary.
 
-
-plot
-----
-Tool for plotting (in Igor Pro compatible *.itx file formats).
-
-**Usage example :** `vw.py plot [band|dos|pband|temp|diel] [additional options]`
-
-#### Required arguments (But mutually exclusive)
-
-  band  : Plot band structure.
-
-  pband : Plot projected band structure.
-
-  dos   : Plot density-of-states.
-
-  diel  : Plot dielectric responses.
-
-#### Sub-options for "band"
-
-  -o [output]       : Setting the name of the output file. (Default : band.itx)
-
-  -fermi [float]    : Manually setting the fermi level. (Default: E-fermi from OUTCAR)
-
-  -s                : Toggle on the automatic shifting of VBM to 0
-
-  -g                : Draw the guiding line for high-symmetry points.
-
-  -fake             : Toggle fake-weight method.
-
-#### Sub-options for "dos"
-
-  -o [output]       : Setting the name of the output file. (Default : dos.itx)
-
-  -fermi [float]    : Manually setting the fermi level. (Default: E-fermi from OUTCAR)
-
-  -c                : Merges every DOS data into a one single .itx file.
-
-#### Sub-options for "pband"
-
-  -o [output]       : Setting the name of the output file. (Default : pband.itx)
-
-  -fermi [float]    : Manually setting the fermi level. (Default: E-fermi from OUTCAR)
-
-  -s                : Toggle on the automatic shifting of VBM to 0
-
-  -g                : Draw the guiding line for high-symmetry points.
-
-  -fake             : Toggle fake-weight method.
-
-  -atom [ints]      : Atom-projected bandstructure. 
-
-  -orb              : Orbital-projected bandstructure.
-
-  -spin             : Toggle spin(mz)-projected bandstructure mode in spin-polarized calculation.
-
-#### Sub-options for "temp"
-
-  -o [output]       : Setting the name of the output file. (Default : tband.itx)
-
-  -fermi [float]    : Manually setting the fermi level. (Default: E-fermi from OUTCAR)
-
-  -t [float]        : Temperature in Kelvin scale. (Default: 300K)
-
-  -emin [float]     : Minimum value of eigenvalues. (Default: -20eV)
-
-  -emax [float]     : Maximum value of eigenvalues. (Default: 15eV)
-
-  -egrid [int]      : Number of eigenvalue grids (y-axis). (Default: 2000)
-
-  -etrunc [float]   : Upper and lower truncation energy. (Default: 1eV)
-
-  -kgrid [int]      : Number of k-grids (x-axis). (Default: 800)
-
-  -smin [float]     : Lower limit of smearing window. (Default: -2eV)
-
-  -smax [float]     : Upper limit of smearing window. (Default: 2eV)
-
-  -sgrid [int]      : Number of smearing grids (local x-axis). (Default: 2000)
-
-  -m [string]       : Type of smearing (G, FD, BE, MB available). (Default: Gaussian)
-
-  -fake             : Toggle fake-weight method.
-   
-#### Sub-options for "diel"
-
-  -o [output]       : Setting the name of the output file. (Default : dielec.itx)
-
-  -d                : Toggle on the transversal and longitudinal direction separation.
-
-  -P                : Selecting the variables to plot in Igor itx file. (eI, eR, n, k, alpha, ELS, R, T, A)
-
-  -D                : Toggle on the manual calculation / inclusion of the Drude peaks.
-
-  -P                : Plasma frequency squared value required in calculating the Drude peaks.
-
-  -t                : Tau (relaxation time) term required in calculating the Drude peaks. (Default : 0.1)
-
----
 
 * ### conv
 
