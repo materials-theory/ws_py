@@ -73,7 +73,7 @@ Tool for handling the polyhedron-related structures and their analysis.
 
 * ### elec
 
-Tool for handling the electronic structure result.
+Tool for handling the electronic structure result, mostly based on the bandstructure calculation.
 
 **Usage example :** `vw.py elec [additional options]`
 
