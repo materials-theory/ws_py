@@ -145,7 +145,7 @@ Tool for plotting (in Igor Pro compatible file formats).
 
   -orb              : Orbital-projected bandstructure.
 
-  -spin             : Toggle spin(mz)-projected bandstructure mode in SOC calculation.
+  -spin             : Toggle spin(mz)-projected bandstructure mode in spin-polarized calculation.
 
 #### Sub-options for "temp"
 

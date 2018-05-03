@@ -351,7 +351,7 @@ Sub-options for "pband"
   -fake             : Toggle fake-weight method.
   -atom [ints]      : Atom-projected bandstructure. 
   -orb              : Orbital-projected bandstructure.
-  -spin             : Toggle spin(mz)-projected bandstructure mode in SOC calculation.
+  -spin             : Toggle spin(mz)-projected bandstructure mode in spin-polarized calculation.
 
 Sub-options for "temp"
   -o [output]       : Setting the name of the output file. (Default : tband.itx)
