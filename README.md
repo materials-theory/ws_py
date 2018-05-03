@@ -5,25 +5,27 @@ A set of python libraries to handle the VASP input / output files.
 
 Requirements
 ------------
-Based on python 3, and have external dependencies on the following packages:
+Based on [python 3](https://python.org), and have external dependencies on the following packages:
 
-* numpy
-* scipy
-* ase
-* argparse (for command-line-tools)
-* pandas (only for "poly" data export)
+* [numpy](http://www.numpy.org)
+* [scipy](https://scipy.org)
+* [ase](https://wiki.fysik.dtu.dk/ase/)
+* [argparse](https://docs.python.org/3/library/argparse.html) (for command-line-tools)
+* [pandas](https://pandas.pydata.org) (only for "poly" data export)
 
-Due to its home-development environment (in OS X), all shebangs and $PATHS must be set manually in order to use it properly.
+Due to its home-development environment (in OS X), all shebangs and $PATHS must be set manually in order to use it properly. Especially, one might need to change **installpath** in `cmdline/vw.py`
 
-Especially, one might need to change **installpath** in `cmdline/vw.py`
-
-All plotting functions are based on Igor Pro (https://www.wavemetrics.com/products/igorpro/igorpro.htm), so one might need to modify plotting functions to use other plotting programs such as gnuplot or matplotlib.
+All plotting functions are based on [Igor Pro](https://www.wavemetrics.com/products/igorpro/igorpro.htm), so one might need to modify plotting functions to use other plotting programs such as [gnuplot](http://www.gnuplot.info) or [matplotlib](https://matplotlib.org).
 
 License and disclaimers
 ------------
 Python codes inside ws_py package are licensed under the GNU General Public License (GPL) v3.
 
 All responsibilities coming from using this packages are on the users, so please kindly double-check the results and use it with an extra care.
+
+Examples / Tutorials
+--------------------
+Simple examples and tutorial sets are provided [HERE](https://github.com/materials-theory/ws_py/tree/master/examples).
 
 Functions
 ------------
@@ -207,7 +209,7 @@ Tool for converting file formats.
 
   -C          : Replaces the center atom position to the centroid of octahedron
 
-  -S          : Toggles the output format in SHAPE program compatible (see http://www.ee.ub.edu)
+  -S          : Toggles the output format in [SHAPE](http://www.ee.ub.edu) program compatible 
 
 ---
 
@@ -237,9 +239,7 @@ Tool for handling the electronic structure result, mostly based on the bandstruc
 
 * ### boltz
 
-Tool for pre / postprocessing files for BoltzTraP.
-
-(see https://www.sciencedirect.com/science/article/pii/S0010465506001305)
+Tool for pre / postprocessing files for [BoltzTraP](https://www.sciencedirect.com/science/article/pii/S0010465506001305).
 
 **Usage example :** `vw.py boltz [prep|post] [additional options]`
 

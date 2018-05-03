@@ -127,11 +127,11 @@ Tool for converting file formats.
 
 `vw.py conv polyxyz -i MoO3.vasp -c Mo -v O`
 
-One can toggle on the SHAPE program formatter using -S tag.
+One can toggle on the [SHAPE](http://www.ee.ub.edu) program formatter using -S tag.
 
 boltz
 -----
 
-* Postprocessing BoltzTraP generated output
+* Postprocessing [BoltzTraP](https://www.sciencedirect.com/science/article/pii/S0010465506001305) generated output
 
 `vw.py boltz post -s`
