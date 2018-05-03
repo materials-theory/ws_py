@@ -27,6 +27,8 @@ plot
 ----
 Tool for plotting (in Igor Pro compatible *.itx file formats).
 
+**Every plotting presets (e.g. style, layout, color scale, ...) can be manually adjusted by modifying `Plotter/plotter.py` and modules therein.**
+
 * Plotting normal bandstructure of Si bulk (/examples/plot/0_band_normal)
 
     `vw.py plot band -g -s`
@@ -86,8 +88,6 @@ Tool for plotting (in Igor Pro compatible *.itx file formats).
     `vw.py plot temp -t 600 -m FD`
 
     This will generate the broadened bandstructure at 600K with Fermi-Dirac distribution applied.
-
-**Every plotting presets (e.g. style, layout, color scale, ...) can be manually adjusted by modifying `Plotter/plotter.py` and modules therein.**
 
 elec
 ----
