@@ -71,30 +71,6 @@ Tool for handling the polyhedron-related structures and their analysis.
 
 ---
 
-* ### elec
-
-Tool for handling the electronic structure result, mostly based on the bandstructure calculation.
-
-**Usage example :** `vw.py elec [additional options]`
-
-#### Options
-
-  -fermi [energy] : Manually setting the fermi level.
-
-  -m              : Toggle on the effective mass calculation tool.
-
-  -e              : Toggle on the band edge position tool.
-
-#### Sub-options for "-m" 
-
-  -k              : Setting the k-point number to calculate carrier effective mass.
-
-  -b              : Setting the band number to calculate carrier effective mass.
-
-  -p              : Setting the number of eigenvalue points to interpolate.
-
----
-
 * ### plot
 
 Tool for plotting (in Igor Pro compatible file formats).
@@ -230,6 +206,30 @@ Tool for converting file formats.
   -C          : Replaces the center atom position to the centroid of octahedron
 
   -S          : Toggles the output format in SHAPE program compatible (see http://www.ee.ub.edu)
+
+---
+
+* ### elec
+
+Tool for handling the electronic structure result, mostly based on the bandstructure calculation.
+
+**Usage example :** `vw.py elec [additional options]`
+
+#### Options
+
+  -fermi [energy] : Manually setting the fermi level.
+
+  -m              : Toggle on the effective mass calculation tool.
+
+  -e              : Toggle on the band edge position tool.
+
+#### Sub-options for "-m" 
+
+  -k              : Setting the k-point number to calculate carrier effective mass.
+
+  -b              : Setting the band number to calculate carrier effective mass.
+
+  -p              : Setting the number of eigenvalue points to interpolate.
 
 ---
 
