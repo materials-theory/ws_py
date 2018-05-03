@@ -1,0 +1,10 @@
+GENE          # use generic interface
+0 0 0 0.0         # iskip (not presently used) idebug setgap shiftgap 
+-0.20105 0.00051 0.36749 24 # E-fermi (Ry), energy grid, energy window, NELECT
+CALC                    # CALC (calculate expansion coeff), NOCALC read from file
+10000                      # lpfac, number of latt-points per k-point
+BOLTZ                   # run mode (only BOLTZ is supported)
+0.14700                   # (efcut) energy range of chemical potential
+600 50                   # Tmax, temperature grid
+-1.                     # energy range of bands in sig_xxx and dos_xxx (xxx is band number)
+HISTO
