@@ -81,9 +81,11 @@ Also note that -orb and -atom option can be used simultaneously.
 
 Red color is set for + occupation, while blue color is set for - occupation in default.
 
-* Plotting temperature-broadened bandstructure with statistical models.
+* Plotting temperature-broadened bandstructure with statistical models. (/examples/plot/8_temp)
 
+`vw.py plot temp -t 600 -m FD`
 
+This will generate the broadened bandstructure at 600K with Fermi-Dirac distribution applied.
 
 **Every plotting presets (e.g. style, layout, color scale, ...) can be manually adjusted by modifying `Plotter/plotter.py` and modules therein.**
 
@@ -91,15 +93,15 @@ elec
 ----
 Tool for handling the electronic structure result, mostly based on the bandstructure calculation.
 
-* Measuring band gap and calculated Fermi energy
+* Measuring band gap and calculated Fermi energy of bulk Si (/examples/elec)
 
 `vw.py elec`
 
-* Determining the band edge positions
+* Determining the band edge positions of bulk Si (/examples/elec)
 
 `vw.py elec -e`
 
-* Calculating effective mass from the bandstructure calculation
+* Calculating hole effective mass of bulk Si from the bandstructure calculation (/examples/elec)
 
 `vw.py elec -m -k 81 -b 4 -p 5`
 
@@ -107,87 +109,29 @@ Fermi energy is only the value provided from VASP calculation. One must use it w
 
 Provided band gap value is the result of sampling through the k-grid used in VASP calculation only. 
 
-Carrier effective mass is based on the parabolic E-k relationship, and the convergence test with respect to the grid density near the band edges, and the number of point stencil used, is necessary.
+Carrier effective mass is based on the parabolic E-k relationship approximation, and the convergence test with respect to the grid density near the band edges, and the number of point stencil used, is necessary.
 
-
-* ### conv
-
+conv
+----
 Tool for converting file formats.
 
-**Usage example :** `vw.py conv [cif2vasp|polyxyz|vasp2qe] -i [input] -o [output]`
+* Converting cif file to VASP compatible structure file (/examples/conv)
 
-#### Required arguments (But mutually exclusive)
+`vw.py conv cif2vasp -i MoO3.cif -o MoO3_alpha.vasp`
 
-  cif2vasp  : Converts cif file to VASP structure format.
+* Converting VASP structure file to Quantum Espresso (pwscf) input file (/examples/conv)
 
-  polyxyz   : Extract the octahedron data in VASP and creates xyz files. 
+`vw.py conv vasp2qe -i MoO3.vasp -o pw.in`
 
-  vasp2qe   : Converts VASP structure file to QE(pwscf) input file format.
+* Converting VASP structure file to .xyz format or SHAPE program compatible format (/examples/conv)
 
-#### Common options
+`vw.py conv polyxyz -i MoO3.vasp -c Mo -v O`
 
-  -i [input]  : Name of the input file.
+One can toggle on the SHAPE program formatter using -S tag.
 
-  -o [output] : Name of the output file.
-  
-#### Sub-options for "polyxyz"
+boltz
+-----
 
-  -i [input]  : Name of the input file.
+* Postprocessing BoltzTraP generated output
 
-  -o [output] : Name of the output file.
-
-  -c [center] : Setting the center atom of the polyhedron. 
-
-  -v [vertex] : Setting the vertex atom of the polyhedron.
-
-  -f [face]   : Setting the number of faces in polyhedron. (Default : 8)
-
-  -l [length] : Setting the bond length limit in building a polyhedron. (Default : 3.0)
-
-  -C          : Replaces the center atom position to the centroid of octahedron
-
-  -S          : Toggles the output format in SHAPE program compatible (see http://www.ee.ub.edu)
-
----
-
-* ### boltz
-
-Tool for pre / postprocessing files for BoltzTraP.
-
-(see https://www.sciencedirect.com/science/article/pii/S0010465506001305)
-
-**Usage example :** `vw.py boltz [prep|post] [additional options]`
-
-#### Required arguments (But mutually exclusive)
-
-  prep  : Prepare files required to use BoltzTraP.
-
-  post  : Postprocess BoltzTraP outputs.
-  
-#### Sub-options for "prep"
-
-  -i [string]       : Name of file to extract structure data (Default : POSCAR)
-
-  -o [string]       : Name of the output file (Default : boltztrap)
-
-  -f [float]        : Fermi energy from scf run (Default : None, automatically reads from OUTCAR)
-
-  -w [float]        : Energy window along Fermi E (Default : 5 eV)
-
-  -g [float]        : Energy grid distance within given window (Default : 0.007 eV)
-
-  -t [integer]      : Maximum temperature to consider (Default : 800 K)
-
-  -step [integer]   : Temperature gradient (Default : 50 K)
-
-  -mu [float]       : Chemical potential window (Default : 2 eV)
-
-  -lpfac [integer]  : Number of lattice points per k-point (Default : 5)
-
-#### Sub-options for "post"
-
-  -o [string]       : Name of the output file (Default : boltzplot.itx)
-
-  -s                : Toggles on the shifting Fermi level to zero
-
----
+`vw.py boltz post -s`
