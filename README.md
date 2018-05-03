@@ -15,6 +15,8 @@ Based on python 3, and have external dependencies on the following packages:
 
 Due to its home-development environment (in OS X), all shebangs and $PATHS must be set manually in order to use it properly.
 
+All plotting functions are based on Igor Pro (https://www.wavemetrics.com/products/igorpro/igorpro.htm), so one might need to modify plotting functions to use other plotting programs such as gnuplot or matplotlib.
+
 License and disclaimers
 ------------
 Python codes inside ws_py package are licensed under the GNU General Public License (GPL) v3.
