@@ -67,7 +67,7 @@ class Plotter(object):
 
         return data
 
-    def plotband(self, fermi, fakeweight, shift, guide):
+    def plotband(self, fermi, fakeweight, shift, guide, ktraj):
         from ElectronicStructure.bandstructure import Bandstructure
 
         if self.outfile is None:
@@ -120,6 +120,14 @@ class Plotter(object):
             out.write("BEGIN\n")
             for i in range(len(guideline)):
                 out.write(str(guideline[i]) + " -30.00 30.00\n")
+            out.write("END\n")
+
+        if ktraj is True:
+            out.write("WAVES/D ")
+            out.write(" " + input_name + "_ktraj_x " + input_name + "_ktraj_y " + input_name + "_ktraj_z\n")
+            out.write("BEGIN\n")
+            for i in range(len(self.banddata.traj)):
+                out.write(" " + str(self.banddata.traj[:, 0][i]) + " " + str(self.banddata.traj[:, 1][i]) + " " + str(self.banddata.traj[:, 2][i]) + "\n")
             out.write("END\n")
 
         # Writing the graph plotting part of .itx

@@ -205,7 +205,7 @@ def executeelec(args):
 
 def executeplotband(args):
     p = plotter.Plotter(args.output)
-    p.plotband(args.fermi, args.fake, args.shift, args.guide)
+    p.plotband(args.fermi, args.fake, args.shift, args.guide, args.ktraj)
     return
 
 
@@ -475,6 +475,7 @@ Sub-options for "post"
     parser_plot_band.add_argument("-s", dest="shift", action='store_true')
     parser_plot_band.add_argument("-fake", dest="fake", action='store_true')
     parser_plot_band.add_argument("-g", dest="guide", action='store_true')
+    parser_plot_band.add_argument("-k", dest="ktraj", action='store_true')
     parser_plot_band.set_defaults(func=executeplotband)
 
     parser_plot_pband = plotsubparsers.add_parser("pband")

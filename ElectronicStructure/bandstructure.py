@@ -29,6 +29,7 @@ class Bandstructure(object):
         self.emass = None
         self.path = None
         self.atominfo = None
+        self.traj = None
 
         return
 
@@ -99,6 +100,7 @@ class Bandstructure(object):
         self.band = band
         self.kvec = k_vec
         self.path = path
+        self.traj = path_conv
 
         return
 
