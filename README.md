@@ -10,10 +10,11 @@ Based on [python 3](https://python.org), and have external dependencies on the f
 * [numpy](http://www.numpy.org)
 * [scipy](https://scipy.org)
 * [ase](https://wiki.fysik.dtu.dk/ase/)
+* [spglib](https://atztogo.github.io/spglib/)
 * [argparse](https://docs.python.org/3/library/argparse.html) (for command-line-tools)
 * [pandas](https://pandas.pydata.org) (only for "poly" data export)
 
-Due to its home-development environment (in OS X), all shebangs and $PATHS must be set manually in order to use it properly. Especially, one might need to change **installpath** in `cmdline/vw.py`
+Due to its home-development environment (in OS X), all shebangs and $PATH might need manual modifications in order to use it properly. Especially, one might need to change **installpath** in `cmdline/vw.py`
 
 All plotting functions are based on [Igor Pro](https://www.wavemetrics.com/products/igorpro/igorpro.htm), so one might need to modify plotting functions to use other plotting programs such as [gnuplot](http://www.gnuplot.info) or [matplotlib](https://matplotlib.org).
 
