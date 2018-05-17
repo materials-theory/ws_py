@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='ws_py',
     version='1.0',
-    packages=['', 'IO', 'struc', 'utils', 'cmdline', 'Parsers', 'Plotter',
+    packages=['IO', 'struc', 'utils', 'cmdline', 'Parsers', 'Plotter',
               'boltztrap', 'polyhedron', 'ElectronicStructure'],
     url='https://github.com/materials-theory/ws_py',
     license='GPL v3',
