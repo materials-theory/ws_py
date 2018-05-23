@@ -731,7 +731,6 @@ class Plotter(object):
         return
 
     def plotdos(self, fermi, combine):
-        # TODO : pDOS function malfunction
 
         from ElectronicStructure.dos import Densityofstates
         self.input_name = "_" + self.input_name
