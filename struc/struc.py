@@ -37,12 +37,13 @@ class Structurehandler(object):
 
     def cartdirconvert(self):
         if self.structure.cart is False:
-            newcoord = StrucOperators.directtocartesian(self.structure.matrix, self.structure.coord)
+            self.structure.coord = StrucOperators.directtocartesian(self.structure.matrix, self.structure.coord)
+            self.structure.cart = True
 
         else:
-            newcoord = StrucOperators.cartesiantodirect(self.structure.matrix, self.structure.coord)
+            self.structure.coord = StrucOperators.cartesiantodirect(self.structure.matrix, self.structure.coord)
+            self.structure.cart = False
 
-        self.structure.coord = newcoord
         return
 
     def as_dict(self):
