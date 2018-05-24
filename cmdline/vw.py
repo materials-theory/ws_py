@@ -14,6 +14,7 @@ from boltztrap import boltztrap
 from Plotter import plotter
 from ElectronicStructure.bandstructure import Bandstructure
 from polyhedron.polyhandler import PolyhedronV
+from struc.struc import Structurehandler
 
 
 def executepoly(args):
@@ -275,10 +276,67 @@ def executetempband(args):
     return
 
 
+def executestruccartdir(args):
+    s = Structurehandler(args.input)
+
+    if s.structure.cart is True:
+        print("Converting Cartesian to Direct coordinate...")
+
+    else:
+        print("Converting Direct to Cartesian coordinate...")
+
+    s.cartdirconvert()
+    dic = s.as_dict()
+
+    with open(args.output, 'w') as out:
+        out.write(dic['index'] + "\n")
+        out.write("1.0\n")
+
+        for x in dic['unitvec']:
+            for y in x:
+                out.write("{:15.10f}".format(y) + "   ")
+            out.write("\n")
+
+        for x in dic['atoms']:
+            out.write("{:>4}".format(x) + "   ")
+        out.write("\n")
+
+        for x in dic['atoms']:
+            out.write("{:4d}".format(dic['atoms'][x]) + "   ")
+        out.write("\n")
+
+        if dic['seldyn'] is True:
+            out.write("Selective Dynamics\n")
+
+        if dic['cart'] is True:
+            out.write("Cartesian\n")
+        elif dic['cart'] is False:
+            out.write("Direct\n")
+
+        for i in range(len(dic['coord'])):
+            for x in dic['coord'][i]:
+                out.write("{:15.10f}".format(x) + "   ")
+                # out.write(str(x) + " ")
+
+            if dic['seldyn'] is True:
+                for x in dic['dyn'][i]:
+                    out.write(str(x) + "   ")
+            out.write("\n")
+
+        if dic['vel'] is not None:
+            for x in dic['vel']:
+                for y in x:
+                    out.write("{:15.10f}".format(y) + "   ")
+                out.write("\n")
+
+    print("Done!")
+    return
+
+
 def main():
-    description = """ws_py.py: a python library to handle the VASP input / output files.
+    description = """ws_py : a python library to handle the VASP input / output files.
 Functions : poly, elec, plot, conv, boltz
-Type ws_py.py [function] --help for more detailed informations.
+Type vw.py [function] --help for more detailed informations.
 """
 
     descpoly = """
@@ -430,6 +488,20 @@ Sub-options for "post"
 -------------------------------------------------------------------------------------------------------
     """
 
+    descstruc = """
+-------------------------------------------------------------------------------------------------------
+"struc" : Tool to handle structure files.
+Usage example : .py struc [additional options]
+
+Required arguments (But mutually exclusive)
+  cartdir  :  Converts Cartesian coordinate system to Direct coordinate system, and vice versa.
+
+Sub-options for "cartdir"
+  -i [string]       : Name of input structure file (Default : POSCAR)
+  -o [string]       : Name of output structure file (Default : POSCAR_conv)
+-------------------------------------------------------------------------------------------------------
+    """
+
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
 
     # Subparsers
@@ -575,6 +647,14 @@ Sub-options for "post"
     parser_boltz_post.add_argument("-o", dest="output", type=str, default=None)
     parser_boltz_post.add_argument("-s", dest="shift", action='store_true')
     parser_boltz_post.set_defaults(func=executeboltzpost)
+
+    parser_struc = subparsers.add_parser("struc", formatter_class=argparse.RawTextHelpFormatter, description=descstruc)
+    strucsubparsers = parser_struc.add_subparsers()
+
+    parser_struc_cartdir = strucsubparsers.add_parser("cartdir")
+    parser_struc_cartdir.add_argument("-i", dest="input", type=str, default='POSCAR')
+    parser_struc_cartdir.add_argument("-o", dest="output", type=str, default='POSCAR_conv')
+    parser_struc_cartdir.set_defaults(func=executestruccartdir)
 
     args = parser.parse_args()
 
