@@ -1,4 +1,3 @@
-import math
 import numpy as np
 from collections import OrderedDict
 from utils.operator import StrucOperators
