@@ -288,6 +288,9 @@ def executestruccartdir(args):
     s.cartdirconvert()
     dic = s.as_dict()
 
+    if args.dyn is False:
+        dic['seldyn'] = False
+
     with open(args.output, 'w') as out:
         out.write(dic['index'] + "\n")
         out.write("1.0\n")
@@ -323,7 +326,7 @@ def executestruccartdir(args):
                     out.write(str(x) + "   ")
             out.write("\n")
 
-        if dic['vel'] is not None:
+        if args.vel is True:
             for x in dic['vel']:
                 for y in x:
                     out.write("{:15.10f}".format(y) + "   ")
@@ -499,6 +502,8 @@ Required arguments (But mutually exclusive)
 Sub-options for "cartdir"
   -i [string]       : Name of input structure file (Default : POSCAR)
   -o [string]       : Name of output structure file (Default : POSCAR_conv)
+  -s                : Removes "Selective Dynamics" part from the file
+  -v                : Includes the velocity part at the bottom of the file
 -------------------------------------------------------------------------------------------------------
     """
 
@@ -654,6 +659,8 @@ Sub-options for "cartdir"
     parser_struc_cartdir = strucsubparsers.add_parser("cartdir")
     parser_struc_cartdir.add_argument("-i", dest="input", type=str, default='POSCAR')
     parser_struc_cartdir.add_argument("-o", dest="output", type=str, default='POSCAR_conv')
+    parser_struc_cartdir.add_argument("-s", dest="dyn", action='store_false')
+    parser_struc_cartdir.add_argument("-v", dest="vel", action='store_true')
     parser_struc_cartdir.set_defaults(func=executestruccartdir)
 
     args = parser.parse_args()
