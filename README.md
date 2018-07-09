@@ -176,7 +176,7 @@ Tool for plotting (in Igor Pro compatible file formats).
 
 * ### conv
 
-Tool for converting file formats.
+Tool for converting file formats. File format converter object is taken from [ASE](https://wiki.fysik.dtu.dk/ase/).
 
 **Usage example :** `vw.py conv [cif2vasp|polyxyz|vasp2qe] -i [input] -o [output]`
 

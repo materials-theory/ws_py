@@ -234,7 +234,7 @@ def executecif2vasp(args):
 
 def executecif2dmol(args):
     c = ConvertV(args.input, args.output)
-    c.cif2vasp()
+    c.cif2dmol()
     return
 
 def executevasp2qe(args):
