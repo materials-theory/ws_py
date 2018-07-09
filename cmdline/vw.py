@@ -8,7 +8,6 @@ import numpy as np
 installpath = '/Users/Woosun/Dropbox/Dev/ws_py'
 sys.path.extend([installpath])
 
-from ElectronicStructure.bandstructure import Bandstructure
 from utils.formatconverter import ConvertV
 from boltztrap import boltztrap
 from Plotter import plotter
@@ -240,6 +239,12 @@ def executevasp2qe(args):
     return
 
 
+def executevasp2cif(args):
+    c = ConvertV(args.input, args.output)
+    c.vasp2cif()
+    return
+
+
 def executeqe2vasp(args):
     c = ConvertV(args.input, args.output)
     c.qe2vasp()
@@ -446,6 +451,8 @@ Usage example : .py conv [cif2vasp|vasp2qe|polyxyz] -i [input] -o [output]
 Required arguments (But mutually exclusive)
   cif2vasp  : Converts cif file to VASP structure format.
   vasp2qe   : Converts VASP structure file to QE input file format.
+  vasp2cif  : Converts VASP structure file to cif file format.
+  qe2vasp   : Extract the structure file from QE input file and writes to VASP structure file format. 
   polyxyz   : Extract the octahedron data in VASP and creates xyz files. 
 
 Common options
@@ -497,7 +504,14 @@ Sub-options for "post"
 Usage example : .py struc [additional options]
 
 Required arguments (But mutually exclusive)
+  trans    :  Translates atomic positions with given translation matrix (1x3)
   cartdir  :  Converts Cartesian coordinate system to Direct coordinate system, and vice versa.
+
+Sub-options for "trans"
+  -i [string]       : Name of input structure file (Default : POSCAR)
+  -o [string]       : Name of output structure file (Default : POSCAR_conv)
+  -t [list]         : Translation matrix (e.g. 0 0 1)
+  -c                : Turn on if the given translation matrix is in the Cartesian coordinates
 
 Sub-options for "cartdir"
   -i [string]       : Name of input structure file (Default : POSCAR)
@@ -618,6 +632,11 @@ Sub-options for "cartdir"
     parser_conv_qe2vasp.add_argument("-i", dest="input", type=str, required=True)
     parser_conv_qe2vasp.add_argument("-o", dest="output", type=str, required=True)
     parser_conv_qe2vasp.set_defaults(func=executeqe2vasp)
+
+    parser_conv_qe2vasp = convsubparsers.add_parser("vasp2cif")
+    parser_conv_qe2vasp.add_argument("-i", dest="input", type=str, required=True)
+    parser_conv_qe2vasp.add_argument("-o", dest="output", type=str, required=True)
+    parser_conv_qe2vasp.set_defaults(func=executevasp2cif)
 
     parser_conv_polyxyz = convsubparsers.add_parser("polyxyz")
     parser_conv_polyxyz.add_argument("-i", dest="input", type=str, required=True)

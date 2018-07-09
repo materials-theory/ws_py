@@ -58,6 +58,7 @@ class StrucParser(object):
         self.atomlist = None
         self.matrix = None
         self.angles = None
+        self.length = None
 
         # self.parsed = None
         self.utils = StrucOperators()
@@ -173,4 +174,5 @@ class StrucParser(object):
         # mat = [[a, (b * cg), (c * cb)], [0, (b * sg), (c * (ca - (cb * cg)) / sg)], [0, 0, (vol / (a * b * sg))]]
         mat = self.unitvec
         self.matrix = np.array(mat)
+        self.length = np.array([a, b, c])
         return

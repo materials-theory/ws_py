@@ -9,5 +9,6 @@ setup(
     license='GPL v3',
     author='Woosun Jang',
     author_email='jin890@yonsei.ac.kr',
-    description='A set of python libraries to handle the VASP input / output files'
+    description='A set of python libraries to handle the VASP input / output files', install_requires=['pandas',
+                                                                                                       'numpy']
 )
