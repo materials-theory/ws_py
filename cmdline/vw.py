@@ -232,6 +232,10 @@ def executecif2vasp(args):
     c.cif2vasp()
     return
 
+def executecif2dmol(args):
+    c = ConvertV(args.input, args.output)
+    c.cif2vasp()
+    return
 
 def executevasp2qe(args):
     c = ConvertV(args.input, args.output)
@@ -623,6 +627,11 @@ Sub-options for "cartdir"
     parser_conv_cif2vasp.add_argument("-o", dest="output", type=str, required=True)
     parser_conv_cif2vasp.set_defaults(func=executecif2vasp)
 
+    parser_conv_cif2dmol = convsubparsers.add_parser("cif2dmol")
+    parser_conv_cif2dmol.add_argument("-i", dest="input", type=str, required=True)
+    parser_conv_cif2dmol.add_argument("-o", dest="output", type=str, required=True)
+    parser_conv_cif2dmol.set_defaults(func=executecif2dmol)
+
     parser_conv_vasp2qe = convsubparsers.add_parser("vasp2qe")
     parser_conv_vasp2qe.add_argument("-i", dest="input", type=str, required=True)
     parser_conv_vasp2qe.add_argument("-o", dest="output", type=str, required=True)
@@ -633,10 +642,10 @@ Sub-options for "cartdir"
     parser_conv_qe2vasp.add_argument("-o", dest="output", type=str, required=True)
     parser_conv_qe2vasp.set_defaults(func=executeqe2vasp)
 
-    parser_conv_qe2vasp = convsubparsers.add_parser("vasp2cif")
-    parser_conv_qe2vasp.add_argument("-i", dest="input", type=str, required=True)
-    parser_conv_qe2vasp.add_argument("-o", dest="output", type=str, required=True)
-    parser_conv_qe2vasp.set_defaults(func=executevasp2cif)
+    parser_conv_vasp2cif = convsubparsers.add_parser("vasp2cif")
+    parser_conv_vasp2cif.add_argument("-i", dest="input", type=str, required=True)
+    parser_conv_vasp2cif.add_argument("-o", dest="output", type=str, required=True)
+    parser_conv_vasp2cif.set_defaults(func=executevasp2cif)
 
     parser_conv_polyxyz = convsubparsers.add_parser("polyxyz")
     parser_conv_polyxyz.add_argument("-i", dest="input", type=str, required=True)

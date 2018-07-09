@@ -31,6 +31,11 @@ class ConvertV(object):
         aio.write(self.outfile + ".cif", atoms, format="cif")
         return
 
+    def cif2dmol(self):
+        atoms = aio.read(self.infile, format="cif")
+        aio.write(self.outfile + ".dmol", atoms, format="dmol-incoor")
+        return
+
     def qe2vasp(self):
         atoms = aio.read(self.infile)
         # atoms = aio.read(self.infile, format="espresso-in")
