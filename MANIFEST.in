@@ -1,0 +1,6 @@
+exclude MANIFEST.in
+include README.md
+include LICENSE
+prune examples
+prune tests
+prune TODO
