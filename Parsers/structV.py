@@ -1,6 +1,6 @@
 import numpy as np
 from collections import OrderedDict
-from utils.operator import StrucOperators
+from generalutils.operator import StrucOperators
 from IO.IO import IO
 
 

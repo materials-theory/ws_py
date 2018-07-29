@@ -1,5 +1,5 @@
 from polyhedron.polyhandler import PolyhedronV as poly
-from utils import operator
+from generalutils import operator
 from ase import io as aio
 
 

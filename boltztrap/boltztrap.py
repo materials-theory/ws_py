@@ -7,7 +7,7 @@ from ase import io
 
 from Parsers.outcarhandler import OutcarHandler
 from ElectronicStructure import bandstructure as bs
-from utils.constants import Unitconverter as Units
+from generalutils.constants import Unitconverter as Units
 
 
 class BoltztrapPreparation(object):

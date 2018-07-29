@@ -7,8 +7,8 @@ from scipy import interpolate
 from Parsers.eigenparserV import EigenParserV
 from Parsers.procarV import ProcarParserV as Procar
 from Parsers.outcarhandler import OutcarHandler as Outcar
-from utils.operator import StrucOperators as utils
-from utils.operator import StatisticFuncs as stats
+from generalutils.operator import StrucOperators as utils
+from generalutils.operator import StatisticFuncs as stats
 from Parsers.structV import ContcarHandler as cont
 
 

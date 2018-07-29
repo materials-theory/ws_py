@@ -1,6 +1,6 @@
 import numpy as np
 from Parsers.structV import StrucParser
-from utils.operator import StrucOperators
+from generalutils.operator import StrucOperators
 
 
 # TODO: Make module consider PBC and repeat atoms based on spg

@@ -8,7 +8,7 @@ import numpy as np
 installpath = '/Users/Woosun/Dropbox/Dev/ws_py'
 sys.path.extend([installpath])
 
-from utils.formatconverter import ConvertV
+from generalutils.formatconverter import ConvertV
 from boltztrap import boltztrap
 from Plotter import plotter
 from ElectronicStructure.bandstructure import Bandstructure

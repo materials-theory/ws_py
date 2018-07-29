@@ -2,7 +2,7 @@ import numpy as np
 import itertools
 import math
 
-from utils.operator import StrucOperators
+from generalutils.operator import StrucOperators
 from Parsers.structV import StrucParser
 
 
@@ -106,7 +106,7 @@ class PolyhedronV:
         vertex_pos = np.reshape(vertex_pos, (len(vertex_pos), 3))
 
         for i in range(len(center_pos)):
-            # poly_pos.append(self.utils.get_points_in_sphere(
+            # poly_pos.append(self.generalutils.get_points_in_sphere(
             #      self.struc.unitvec, self.struc.matrix, vertex_pos, center_pos[i], self.bondmax, self.struc.cart))
             poly_pos.append(self.utils.atomsinsphere(
                self.struc.unitvec, self.struc.matrix, vertex_pos, center_pos[i], self.bondmax, self.struc.cart))
