@@ -1,0 +1,17 @@
+language: python
+cache: pip
+dist: trusty
+sudo: false
+
+python:
+    - "3.4"
+    - "3.5"
+    - "3.6"
+
+install:
+    - python setup.py install
+
+# run tests -- separated test suite will be combined and added
+script:
+    - cd tests
+#    - py.test
