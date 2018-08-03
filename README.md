@@ -1,5 +1,5 @@
 ws_py
-[![Build Status](https://travis-ci.org/materials-theory/ws_py.svg?branch=master)](https://travis-ci.org/materials-theory/ws_py)
+[![Build Status](https://travis-ci.com/materials-theory/ws_py.svg?branch=master)](https://travis-ci.com/materials-theory/ws_py)
 [![Code Health](https://landscape.io/github/materials-theory/ws_py/master/landscape.svg?style=flat)](https://landscape.io/github/materials-theory/ws_py/master)
 ========
 A set of python libraries to handle the VASP input / output files.
