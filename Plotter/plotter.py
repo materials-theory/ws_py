@@ -5,12 +5,15 @@ from IO.IO import IO
 # TODO: Moving out the import statement
 
 class Plotter(object):
-    def __init__(self, outfile):
+    def __init__(self, outfile, inputname=None):
         self.outfile = outfile
         self.banddata = None
         self.dosdata = None
         self.io = None
-        self.input_name = input("Please input the name of system  :  ")
+        if inputname is None:
+            self.input_name = input("Please input the name of system  :  ")
+        else:
+            self.input_name = inputname
         return
 
     def boltzplot(self, boltzdic, shift):

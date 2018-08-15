@@ -222,7 +222,7 @@ def executeplotdos(args):
 
 
 def executeplotdielectric(args):
-    p = plotter.Plotter(args.output)
+    p = plotter.Plotter(args.output, args.input)
     p.plotdielectric(args.direction, args.plot, args.drude, args.plasmasq, args.tau)
     return
 
@@ -599,6 +599,7 @@ Sub-options for "cartdir"
     parser_plot_diel.add_argument("-D", dest="drude", action='store_true')
     parser_plot_diel.add_argument("-P", dest="plasmasq", type=float, default=None)
     parser_plot_diel.add_argument("-t", dest="tau", type=float, default=0.1)
+    parser_plot_diel.add_argument("-i", dest="prefix", type=str, default=None)
     parser_plot_diel.set_defaults(func=executeplotdielectric)
 
     parser_plot_temp = plotsubparsers.add_parser("temp")
