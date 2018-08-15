@@ -222,7 +222,7 @@ def executeplotdos(args):
 
 
 def executeplotdielectric(args):
-    p = plotter.Plotter(args.output, args.input)
+    p = plotter.Plotter(args.output, args.prefix)
     p.plotdielectric(args.direction, args.plot, args.drude, args.plasmasq, args.tau)
     return
 
