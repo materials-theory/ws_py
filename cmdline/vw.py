@@ -204,19 +204,19 @@ def executeelec(args):
 
 
 def executeplotband(args):
-    p = plotter.Plotter(args.output)
+    p = plotter.Plotter(args.output, args.prefix)
     p.plotband(args.fermi, args.fake, args.shift, args.guide, args.ktraj)
     return
 
 
 def executeplotpband(args):
-    p = plotter.Plotter(args.output)
+    p = plotter.Plotter(args.output, args.prefix)
     p.plotprojectedband(args.fermi, args.fake, args.shift, args.guide, args.spin, args.atom, args.orbital)
     return
 
 
 def executeplotdos(args):
-    p = plotter.Plotter(args.output)
+    p = plotter.Plotter(args.output, args.prefix)
     p.plotdos(args.fermi, args.combine)
     return
 
@@ -571,6 +571,7 @@ Sub-options for "cartdir"
     parser_plot_band.add_argument("-fake", dest="fake", action='store_true')
     parser_plot_band.add_argument("-g", dest="guide", action='store_true')
     parser_plot_band.add_argument("-k", dest="ktraj", action='store_true')
+    parser_plot_band.add_argument("-i", dest="prefix", type=str, default=None)
     parser_plot_band.set_defaults(func=executeplotband)
 
     parser_plot_pband = plotsubparsers.add_parser("pband")
@@ -584,12 +585,14 @@ Sub-options for "cartdir"
     # parser_plot_pband.add_argument("-atom", dest="atom", action='store_true')
     parser_plot_pband.add_argument("-atom", dest="atom", type=str, default=None, nargs='*')
     parser_plot_pband.add_argument("-orb", dest="orbital", action='store_true')
+    parser_plot_pband.add_argument("-i", dest="prefix", type=str, default=None)
     parser_plot_pband.set_defaults(func=executeplotpband)
 
     parser_plot_dos = plotsubparsers.add_parser("dos")
     parser_plot_dos.add_argument("-o", dest="output", type=str, default=None)
     parser_plot_dos.add_argument("-fermi", dest="fermi", type=float, default="0.0")
     parser_plot_dos.add_argument("-c", dest="combine", action='store_true')
+    parser_plot_dos.add_argument("-i", dest="prefix", type=str, default=None)
     parser_plot_dos.set_defaults(func=executeplotdos)
 
     parser_plot_diel = plotsubparsers.add_parser("diel")
