@@ -232,10 +232,12 @@ def executecif2vasp(args):
     c.cif2vasp()
     return
 
+
 def executecif2dmol(args):
     c = ConvertV(args.input, args.output)
     c.cif2dmol()
     return
+
 
 def executevasp2qe(args):
     c = ConvertV(args.input, args.output)
