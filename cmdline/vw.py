@@ -14,6 +14,7 @@ from Plotter import plotter
 from ElectronicStructure.bandstructure import Bandstructure
 from polyhedron.polyhandler import PolyhedronV
 from struc.struc import Structurehandler
+from decimal import Decimal
 
 
 def executepoly(args):
@@ -194,10 +195,14 @@ def executeelec(args):
         print("CBM : %4f eV (k-point # %3i, band # %3i)" % (e.cbm[2], e.cbm[0] + 1, e.cbm[1] + 1))
 
     if args.mass is True:
-        e.effectivemass(args.band, args.kpoint, args.points)
+        e.effectivemass(args.band, args.kpoint, args.points, args.residuals)
         for x in e.emass:
             print("Effective mass of carrier at k-point # %3i, band # %3i to the %5s : %5f" %
                   (args.kpoint, args.band, x[1], float(x[0])))
+        if args.residuals is True:
+            for x in e.emass_residuals:
+                print("Residuals of the least-square fit to the %5s : %4.4E" %
+                      (x[1], Decimal(x[0])))
         print("-----------------------------------------------------------------------------------------")
 
     return
@@ -389,6 +394,7 @@ Sub-options for "-m"
   -k              : Setting the k-point number to calculate carrier effective mass.
   -b              : Setting the band number to calculate carrier effective mass.
   -p              : Setting the number of eigenvalue points to interpolate.
+  -r              : Displays the residuals of the least-square parabolic fit.
 -------------------------------------------------------------------------------------------------------"""
 
     descplot = """
@@ -560,6 +566,7 @@ Sub-options for "cartdir"
     parser_elec.add_argument("-b", dest="band", type=int, default=0)
     parser_elec.add_argument("-k", dest="kpoint", type=int, default=0)
     parser_elec.add_argument("-p", dest="points", type=int, default=5)
+    parser_elec.add_argument("-r", dest="residuals", action='store_true')
     parser_elec.set_defaults(func=executeelec)
 
     # Plotting tool parsers

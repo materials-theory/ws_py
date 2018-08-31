@@ -30,6 +30,7 @@ class Bandstructure(object):
         self.path = None
         self.atominfo = None
         self.traj = None
+        self.emass_residuals = None
 
         return
 
@@ -470,7 +471,7 @@ class Bandstructure(object):
 
         return
 
-    def effectivemass(self, band, kpoint, points):
+    def effectivemass(self, band, kpoint, points, show_residuals):
         ev_joule_conv = 1.60217733 * 10 ** (-19)
         plank_const = 6.626070040 * 10 ** (-34)
         h_bar = plank_const / (2 * math.pi)
@@ -478,6 +479,7 @@ class Bandstructure(object):
         recvec = np.array(utils().recvec(cont.unitvec()))
 
         emass = []
+        residuals = []
 
         if band is 0:
             kp = self.vbm[0]
@@ -532,6 +534,7 @@ class Bandstructure(object):
 
             emass_raw = (h_bar ** 2) / (curvature_quad * 10 ** (-20))
             emass.append([emass_raw / m_zero, "Left"])
+            residuals.append([poly[1][0], "Left"])
 
         # Right direction
         if kp + points > len(self.eigen.path):
@@ -575,8 +578,10 @@ class Bandstructure(object):
 
             emass_raw = (h_bar ** 2) / (curvature_quad * 10 ** (-20))
             emass.append([emass_raw / m_zero, "Right"])
+            residuals.append([poly[1][0], "Right"])
 
         self.emass = np.array(emass)
+        self.emass_residuals = np.array(residuals)
 
         return
 
