@@ -1284,7 +1284,6 @@ class Plotter(object):
                     dos.write("\n")
                 dos.write("END\n")
 
-
             dos.write(tdosdisplayforcomb)
             for i in range(len(sumdosappend)):
                 dos.write(sumdosappend[i])
