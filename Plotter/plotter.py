@@ -624,7 +624,7 @@ class Plotter(object):
         def coeff_calc(imag, real, freq):
             n_index = np.sqrt((np.sqrt(imag ** 2 + real ** 2) + real) / 2.0)
             k_coeff = np.sqrt((np.sqrt(imag ** 2 + real ** 2) - real) / 2.0)
-            alpha = (4 * np.pi * k_coeff) / freq
+            alpha = (4 * np.pi * k_coeff) / (1240.0 / freq)
             ELS = imag / (real ** 2 + imag ** 2)
             R = ((n_index - 1) ** 2 + k_coeff ** 2) / ((n_index + 1) ** 2 + k_coeff ** 2)
             T = 1 - R
