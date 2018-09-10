@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='vw-master',
-    version='',
+    version='1.0',
     packages=['tests', 'vw_py', 'vw_py.IO', 'vw_py.struc', 'vw_py.cmdline', 'vw_py.Parsers',
               'vw_py.Plotter', 'vw_py.boltztrap', 'vw_py.polyhedron', 'vw_py.generalutils',
               'vw_py.ElectronicStructure', 'examples'],
