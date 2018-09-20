@@ -40,7 +40,7 @@ class DosParserV(object):
         # mag_mult = None
 
         tdos_avail = [3, 5]
-        pdos_avail = [4, 7, 10, 13]
+        pdos_avail = [4, 7, 10, 13, 37]
 
         # tDOS
         # ISPIN = 2, LSORBIT = F
