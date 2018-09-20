@@ -10,5 +10,5 @@ setup(
     license='GPL 3.0',
     author='Woosun Jang',
     author_email='jin890@yonsei.ac.kr',
-    description='Python script to post-process VASP generated files'
+    description='Python script to post-process VASP generated files', install_requires=['numpy']
 )
