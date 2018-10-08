@@ -1,16 +1,17 @@
-from xml.etree import ElementTree as ET
+from xml.etree import ElementTree as etree
 
+# TODO: Change the way calling parsers -- do not call many times
 
-#TODO: Change the way calling parser -- do not call many times
-#TODO: VASP 5.4.4 density-density and current-current dielectric function parsing problem
-#Currently adopted from "Vasprun" class from Pymatgen (http://pymatgen.org)
-#Need to be updated
+# Modified version of "Vasprun" class in Pymatgen (http://pymatgen.org)
+# Need to be updated
+
 
 class xmlParserV:
     def __init__(self):
-        self.dielectric = None
-        self.other_dielectric = None
-        self.lfe = None
+        self.version = None
+        self.dielectric = {}
+        self.other_dielectric = {}
+        self.lfe = {}
         # self.Parser(filename)
 
         self.parser()
@@ -18,17 +19,33 @@ class xmlParserV:
 
     def parser(self, filename='vasprun.xml'):
         print("Parsing vasprun.xml...")
-        for event, elem in ET.iterparse(filename):
+        for event, elem in etree.iterparse(filename):
             tag = elem.tag
+            if tag == "generator":
+                for x in elem.findall("i"):
+                    if x.attrib["name"] == "version":
+                        self.version = x.text.split()[0][0:5]
 
             if tag == "dielectricfunction":
                 if "comment" not in elem.attrib:
-                    self.dielectric = self._parse_diel(elem)
+                    if self.version >= "5.4.4":
+                        if "density" not in self.dielectric:
+                            self.dielectric["density"] = self._parse_diel(elem)
+                        else:
+                            self.dielectric["current"] = self._parse_diel(elem)
+                    else:
+                        self.dielectric["normal"] = self._parse_diel(elem)
                     self.lfe = False
 
                 elif elem.attrib["comment"] == \
                         "HEAD OF MICROSCOPIC DIELECTRIC TENSOR (INDEPENDENT PARTICLE)":
-                    self.other_dielectric = self._parse_diel(elem)
+                    if self.version >= "5.4.4":
+                        if "density" not in self.dielectric:
+                            self.other_dielectric["density"] = self._parse_diel(elem)
+                        else:
+                            self.other_dielectric["current"] = self._parse_diel(elem)
+                    else:
+                        self.other_dielectric["normal"] = self._parse_diel(elem)
 
                 elif elem.attrib["comment"] == \
                         "1 + v P,  with REDUCIBLE POLARIZABILTY P=P_0 (1 -(v+f) P_0)^-1":
@@ -36,7 +53,13 @@ class xmlParserV:
 
                 elif elem.attrib["comment"] == \
                         "INVERSE MACROSCOPIC DIELECTRIC TENSOR (including local field effects in RPA (Hartree))":
-                    self.dielectric = self._parse_diel(elem)
+                    if self.version >= "5.4.4":
+                        if "density" not in self.dielectric:
+                            self.dielectric["density"] = self._parse_diel(elem)
+                        else:
+                            self.dielectric["current"] = self._parse_diel(elem)
+                    else:
+                        self.dielectric["normal"] = self._parse_diel(elem)
                     self.lfe = True
 
                 elif elem.attrib["comment"] == \
