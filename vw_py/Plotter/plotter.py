@@ -532,17 +532,12 @@ class Plotter(object):
         np.seterr(divide='ignore', invalid='ignore')
 
         if self.outfile is None:
-            self.outfile = 'optics.itx'
+            self.outfile = 'dielec.itx'
         else:
             self.outfile = self.outfile + '.itx'
 
         self.io = IO(None, self.outfile)
         out = self.io.WriteFile()
-
-        if toplot is None:
-            toplot = 'eI'
-        else:
-            pass
 
         def wavename(waves, suffix=''):
             wavename = []
@@ -629,103 +624,117 @@ class Plotter(object):
 
             return [n_index, k_coeff, alpha, ELS, R, T, A]
 
-        data = xml.xmlParserV().dielectric
+        data = xml.xmlParserV()
 
         print("-----------------------------------------------------------------------------------------------")
+        print("VASP version %s..." % data.version)
         print("Plotting dielectric response...")
         # input_name = input("Please input the name of system  :  ")
+        count = 0
 
-        di_imag = np.array(data[0])
-        di_real = np.array(data[1])
+        for method in data.dielectric.keys():
+            di_imag = np.array(data.dielectric[method][0])
+            di_real = np.array(data.dielectric[method][1])
 
-        # Dielectric function is arranged like:
-        # E / XX / YY / ZZ / XY / YZ / ZX
+            # Dielectric function is arranged like:
+            # E / XX / YY / ZZ / XY / YZ / ZX
 
-        freq = di_imag[:, 0]
-        freq_nm = 1240.0 / freq
+            freq = di_imag[:, 0]
+            freq_nm = 1240.0 / freq
 
-        if drude:
-            print("Calculating Drude contributions in dielectric responses...")
+            if drude:
+                print("Calculating Drude contributions in dielectric responses...")
 
-            eI_drude = (tau * plasmasq) / (freq * (freq ** 2 + tau ** 2))
-            eR_drude = 1 - plasmasq / (freq * (freq ** 2 + tau ** 2))
+                eI_drude = (tau * plasmasq) / (freq * (freq ** 2 + tau ** 2))
+                eR_drude = 1 - plasmasq / (freq * (freq ** 2 + tau ** 2))
 
-            for i in range(3):
-                di_imag[:, i+1] = di_imag[:, i+1] + eI_drude
-                di_real[:, i+1] = di_real[:, i+1] + eR_drude
+                for i in range(3):
+                    di_imag[:, i+1] = di_imag[:, i+1] + eI_drude
+                    di_real[:, i+1] = di_real[:, i+1] + eR_drude
 
-        if direction is False:
-            eI = np.average(di_imag[:, [1, 2, 3]], 1)
-            eR = np.average(di_real[:, [1, 2, 3]], 1)
+            if direction is False:
+                eI = np.average(di_imag[:, [1, 2, 3]], 1)
+                eR = np.average(di_real[:, [1, 2, 3]], 1)
 
-            coeffs = coeff_calc(eI, eR, freq)
-            waves = ['eI', 'eR', 'n', 'k', 'alpha', 'ELS', 'R', 'T', 'A', 'freq', 'freq_nm']
+                coeffs = coeff_calc(eI, eR, freq)
+                waves = ['eI_' + method, 'eR_' + method, 'n_' + method, 'k_' + method, 'alpha_' + method, 'ELS_' + method,
+                         'R_' + method, 'T_' + method, 'A_' + method, 'freq_' + method, 'freq_nm_' + method]
 
-            toitx = [eI, eR]
+                toitx = [eI, eR]
 
-            for x in coeffs:
-                toitx.append(x)
+                for x in coeffs:
+                    toitx.append(x)
 
-            toitx.append(freq)
-            toitx.append(freq_nm)
+                toitx.append(freq)
+                toitx.append(freq_nm)
 
-            wave = wavename(waves)
-            out.write("IGOR\n")
-            itxheader(wave)
-            itxwave(np.array(toitx))
+                wave = wavename(waves)
 
-            if len(toplot) > 1:
-                for x in toplot:
-                    itxdisplay(x, wave)
+                if count == 0:
+                    out.write("IGOR\n")
+                    count += 1
+
+                itxheader(wave)
+                itxwave(np.array(toitx))
+
+                if len(toplot) > 1:
+                    for x in toplot:
+                        itxdisplay(x, wave)
+                else:
+                    for x in toplot:
+                        itxdisplay(x, wave)
+
             else:
-                for x in toplot:
+                eI_trans = np.average(di_imag[:, [1, 2]], 1)
+                eI_longi = np.average(di_imag[:, [3]], 1)
+                eR_trans = np.average(di_real[:, [1, 2]], 1)
+                eR_longi = np.average(di_real[:, [3]], 1)
+
+                coeffs_trans = coeff_calc(eI_trans, eR_trans, freq)
+                coeffs_longi = coeff_calc(eI_longi, eR_longi, freq)
+
+                waves = ['eI_' + method, 'eR_' + method, 'n_' + method, 'k_' + method, 'alpha_' + method,
+                         'ELS_' + method,
+                         'R_' + method, 'T_' + method, 'A_' + method, 'freq_' + method, 'freq_nm_' + method]
+
+                toitx = [eI_trans, eR_trans]
+
+                for x in coeffs_trans:
+                    toitx.append(x)
+
+                toitx.append(freq)
+                toitx.append(freq_nm)
+
+                wave = wavename(waves, 'trans')
+
+                if count == 0:
+                    out.write("IGOR\n")
+                    count += 1
+
+                itxheader(wave)
+                itxwave(np.array(toitx))
+
+                for x in toplot.split():
                     itxdisplay(x, wave)
 
-        else:
-            eI_trans = np.average(di_imag[:, [1, 2]], 1)
-            eI_longi = np.average(di_imag[:, [3]], 1)
-            eR_trans = np.average(di_real[:, [1, 2]], 1)
-            eR_longi = np.average(di_real[:, [3]], 1)
+                toitx = [eI_longi, eR_longi]
 
-            coeffs_trans = coeff_calc(eI_trans, eR_trans, freq)
-            coeffs_longi = coeff_calc(eI_longi, eR_longi, freq)
+                for x in coeffs_longi:
+                    toitx.append(x)
 
-            waves = ['eI', 'eR', 'n', 'k', 'alpha', 'ELS', 'R', 'T', 'A', 'freq', 'freq_nm']
+                toitx.append(freq)
+                toitx.append(freq_nm)
 
-            toitx = [eI_trans, eR_trans]
+                wave = wavename(waves, 'longi')
+                itxheader(wave)
+                itxwave(np.array(toitx))
 
-            for x in coeffs_trans:
-                toitx.append(x)
-
-            toitx.append(freq)
-            toitx.append(freq_nm)
-
-            wave = wavename(waves, 'trans')
-            out.write("IGOR\n")
-            itxheader(wave)
-            itxwave(np.array(toitx))
-
-            for x in toplot.split():
-                itxdisplay(x, wave)
-
-            toitx = [eI_longi, eR_longi]
-
-            for x in coeffs_trans:
-                toitx.append(x)
-
-            toitx.append(freq)
-            toitx.append(freq_nm)
-
-            wave = wavename(waves, 'longi')
-            itxheader(wave)
-            itxwave(np.array(toitx))
-
-            if len(toplot) > 1:
-                for x in toplot:
-                    itxdisplay(x, wave)
-            else:
-                for x in toplot:
-                    itxdisplay(x, wave)
+                if len(toplot) > 1:
+                    for x in toplot:
+                        itxdisplay(x, wave)
+                else:
+                    for x in toplot:
+                        itxdisplay(x, wave)
 
         print("Done!")
         return
