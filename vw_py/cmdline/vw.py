@@ -278,8 +278,12 @@ def executeboltzprep(args):
 def executeboltzpost(args):
     b = boltztrap.BoltztrapPost(args.input)
     # b.name(args.input)
+    shift = 0.0
     if args.shift:
-        shift = b.intransparser()['fermi']
+        if args.fermi is None:
+            shift = b.intransparser()['fermi']
+        else:
+            shift = args.fermi
     p = plotter.Plotter(args.output)
     p.boltzplot(b.traceparser(), shift)
     return
@@ -692,6 +696,7 @@ Sub-options for "cartdir"
     parser_boltz_post.add_argument("-i", dest="input", type=str, default='boltztrap')
     parser_boltz_post.add_argument("-o", dest="output", type=str, default=None)
     parser_boltz_post.add_argument("-s", dest="shift", action='store_true')
+    parser_boltz_post.add_argument("-f", dest="fermi", type=float, default=0.0)
     parser_boltz_post.set_defaults(func=executeboltzpost)
 
     parser_struc = subparsers.add_parser("struc", formatter_class=argparse.RawTextHelpFormatter, description=descstruc)
