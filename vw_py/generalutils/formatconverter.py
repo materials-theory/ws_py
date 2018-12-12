@@ -26,6 +26,11 @@ class ConvertV(object):
         aio.write(self.outfile + ".in", atoms, format="espresso-in")
         return
 
+    def cif2qe(self):
+        atoms = aio.read(self.infile, format="cif")
+        aio.write(self.outfile + ".in", atoms, format="espresso-in")
+        return
+
     def vasp2cif(self):
         atoms = aio.read(self.infile, format="vasp")
         aio.write(self.outfile + ".cif", atoms, format="cif")

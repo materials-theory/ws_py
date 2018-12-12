@@ -243,6 +243,10 @@ def executecif2dmol(args):
     c.cif2dmol()
     return
 
+def executecif2qe(args):
+    c = ConvertV(args.input, args.output)
+    c.cif2qe()
+    return
 
 def executevasp2qe(args):
     c = ConvertV(args.input, args.output)
@@ -663,6 +667,11 @@ Sub-options for "cartdir"
     parser_conv_vasp2cif.add_argument("-i", dest="input", type=str, required=True)
     parser_conv_vasp2cif.add_argument("-o", dest="output", type=str, required=True)
     parser_conv_vasp2cif.set_defaults(func=executevasp2cif)
+
+    parser_conv_cif2qe = convsubparsers.add_parser("cif2qe")
+    parser_conv_cif2qe.add_argument("-i", dest="input", type=str, required=True)
+    parser_conv_cif2qe.add_argument("-o", dest="output", type=str, required=True)
+    parser_conv_cif2qe.set_defaults(func=executecif2qe)
 
     parser_conv_polyxyz = convsubparsers.add_parser("polyxyz")
     parser_conv_polyxyz.add_argument("-i", dest="input", type=str, required=True)
