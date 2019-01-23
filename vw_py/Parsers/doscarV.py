@@ -27,14 +27,15 @@ class DosParserV(object):
         self.nedos = None
         self.atoms = None
 
+        self.ispin = int(self.outcar.param_from_outcar('ISPIN'))
+        self.lorbit = int(self.outcar.param_from_outcar('LORBIT'))
+        self.lsorbit = str(self.outcar.param_from_outcar('LSORBIT'))
+
         self.dosline()
         self.parser()
         return
 
     def dosline(self):
-        ispin = int(self.outcar.param_from_outcar('ISPIN'))
-        lorbit = int(self.outcar.param_from_outcar('LORBIT'))
-        lsorbit = str(self.outcar.param_from_outcar('LSORBIT'))
 
         orbit_mult = None
         # mag_mult = None
@@ -47,7 +48,7 @@ class DosParserV(object):
         # 5 - E tu td inu ind
         # Others
         # 3 - E t in
-        if ispin == 2 and lsorbit == "F":
+        if self.ispin == 2 and self.lsorbit == "F":
             self.numtdos = 5
         else:
             self.numtdos = 3
@@ -66,17 +67,17 @@ class DosParserV(object):
         # 19 - E su sd pxu pxd pyu pyd pzu pzd dxyu dxyd dyzu dyzd dz2u dz2d dxzu dxzd dx2u dx2d (????)
         # ISPIN=1,2, LORBIT=11,12, LSORBIT=T
         # 37 - E ???
-        if lorbit == 10:
+        if self.lorbit == 10:
             orbit_mult = 3
-        elif lorbit == 11 or lorbit == 12:
+        elif self.lorbit == 11 or self.lorbit == 12:
             orbit_mult = 9
 
-        if lsorbit == "T":
+        if self.lsorbit == "T":
             mag_mult = 4
         else:
             mag_mult = 1
 
-        self.numpdos = (ispin * orbit_mult * mag_mult) + 1
+        self.numpdos = (self.ispin * orbit_mult * mag_mult) + 1
 
         if self.numtdos not in tdos_avail or self.numpdos not in pdos_avail:
             raise NotImplementedError("Can't parse this DOSCAR file!")
@@ -111,6 +112,11 @@ class DosParserV(object):
             tdos_array.append(dos.pop(0).split())
         tdos_array = np.reshape(np.array(tdos_array, dtype='d'), (self.nedos, self.numtdos))
 
+        # Multiplying -1 to down-spin tdos
+        if self.ispin == 2 and self.lsorbit == "F":
+            tdos_array[:, 2] = tdos_array[:, 2] * -1
+            tdos_array[:, 4] = tdos_array[:, 4] * -1
+
         # Writing pDOS part to an array
         self.atoms = self.cont.atominfo()
         totalcount = 0
@@ -125,6 +131,18 @@ class DosParserV(object):
                 tmp_array[j].append(str(np.sum(np.array(tmp_array[j], dtype='d')[1:])))
             pdos_array.append(tmp_array)
         pdos_array = np.reshape(np.array(pdos_array, dtype='d'), (totalcount, self.nedos, self.numpdos + 1))
+
+        # Multiplying -1 to down-spin pdos
+        if self.ispin == 2:
+            for i in range(totalcount):
+                for j in range(self.numpdos + 1):
+                    if j == 0:
+                        pass
+                    else:
+                        if np.mod(j, 2) == 0:
+                            pdos_array[i, :, j] = pdos_array [i, :, j] * -1
+                        else:
+                            pass
 
         # Summing up pDOS to generate sumDOS array
         count = 0
