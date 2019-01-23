@@ -16,6 +16,7 @@ class Densityofstates(object):
         self.numsumdos = None
         self.atominfo = None
         self.nedos = None
+        self.numpdos_add = None
 
         return
 
@@ -49,5 +50,6 @@ class Densityofstates(object):
         self.numsumdos = self.doscar.numsumdos
         self.atominfo = self.doscar.atoms
         self.nedos = self.doscar.nedos
+        self.numpdos_add = self.doscar.numpdos_add
 
         return

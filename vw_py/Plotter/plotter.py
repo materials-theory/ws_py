@@ -847,7 +847,8 @@ class Plotter(object):
                            + "sumDOS_" + x + "_p_dw" + self.input_name + " "
                            + "sumDOS_" + x + "_d_up" + self.input_name + " "
                            + "sumDOS_" + x + "_d_dw" + self.input_name + " "
-                           + "sumDOS_" + x + "" + self.input_name + " "
+                           + "sumDOS_" + x + "_up" + self.input_name + " "
+                           + "sumDOS_" + x + "_dw" + self.input_name + " "
                            )
                 sumdis = ("X Display "
                           + "sumDOS_" + x + "_s_up" + self.input_name + " "
@@ -856,7 +857,8 @@ class Plotter(object):
                           + "sumDOS_" + x + "_p_dw" + self.input_name + " "
                           + "sumDOS_" + x + "_d_up" + self.input_name + " "
                           + "sumDOS_" + x + "_d_dw" + self.input_name + " "
-                          + "sumDOS_" + x + "" + self.input_name + " "
+                          + "sumDOS_" + x + "_up" + self.input_name + " "
+                          + "sumDOS_" + x + "_dw" + self.input_name + " "
                           + "vs "
                           + "E_sumDOS_" + x + "" + self.input_name + " "
                           + "as "
@@ -869,7 +871,8 @@ class Plotter(object):
                           + "sumDOS_" + x + "_p_dw" + self.input_name + " "
                           + "sumDOS_" + x + "_d_up" + self.input_name + " "
                           + "sumDOS_" + x + "_d_dw" + self.input_name + " "
-                          + "sumDOS_" + x + "" + self.input_name + " "
+                          + "sumDOS_" + x + "_up" + self.input_name + " "
+                          + "sumDOS_" + x + "_dw" + self.input_name + " "
                           + "vs "
                           + "E_sumDOS_" + x + "" + self.input_name + "\n"
                           )
@@ -882,7 +885,8 @@ class Plotter(object):
                                + "pDOS_" + x + str(y + 1) + "_p_dw" + self.input_name + " "
                                + "pDOS_" + x + str(y + 1) + "_d_up" + self.input_name + " "
                                + "pDOS_" + x + str(y + 1) + "_d_dw" + self.input_name + " "
-                               + "pDOS_" + x + str(y + 1) + "" + self.input_name + " "
+                               + "pDOS_" + x + str(y + 1) + "up" + self.input_name + " "
+                               + "pDOS_" + x + str(y + 1) + "dw" + self.input_name + " "
                                )
                     tmpdisplay = ("X Display "
                                   + "pDOS_" + x + str(y + 1) + "_s_up" + self.input_name + " "
@@ -891,7 +895,8 @@ class Plotter(object):
                                   + "pDOS_" + x + str(y + 1) + "_p_dw" + self.input_name + " "
                                   + "pDOS_" + x + str(y + 1) + "_d_up" + self.input_name + " "
                                   + "pDOS_" + x + str(y + 1) + "_d_dw" + self.input_name + " "
-                                  + "pDOS_" + x + str(y + 1) + "" + self.input_name + " "
+                                  + "pDOS_" + x + str(y + 1) + "up" + self.input_name + " "
+                                  + "pDOS_" + x + str(y + 1) + "dw" + self.input_name + " "
                                   + "vs "
                                   + "E_pDOS_" + x + str(y + 1) + "" + self.input_name + " "
                                   + "as "
@@ -1098,7 +1103,8 @@ class Plotter(object):
                            + "sumDOS_" + x + "_dxz_dw" + self.input_name + " "
                            + "sumDOS_" + x + "_dx2_up" + self.input_name + " "
                            + "sumDOS_" + x + "_dx2_dw" + self.input_name + " "
-                           + "sumDOS_" + x + "" + self.input_name + " "
+                           + "sumDOS_" + x + "_up" + self.input_name + " "
+                           + "sumDOS_" + x + "_dw" + self.input_name + " "
                            )
                 sumdis = ("X Display "
                           + "sumDOS_" + x + "_s_up" + self.input_name + " "
@@ -1119,7 +1125,8 @@ class Plotter(object):
                           + "sumDOS_" + x + "_dxz_dw" + self.input_name + " "
                           + "sumDOS_" + x + "_dx2_up" + self.input_name + " "
                           + "sumDOS_" + x + "_dx2_dw" + self.input_name + " "
-                          + "sumDOS_" + x + "" + self.input_name + " "
+                          + "sumDOS_" + x + "_up" + self.input_name + " "
+                          + "sumDOS_" + x + "_dw" + self.input_name + " "
                           + "vs "
                           + "E_sumDOS_" + x + "" + self.input_name + " "
                           + "as "
@@ -1144,7 +1151,8 @@ class Plotter(object):
                           + "sumDOS_" + x + "_dxz_dw" + self.input_name + " "
                           + "sumDOS_" + x + "_dx2_up" + self.input_name + " "
                           + "sumDOS_" + x + "_dx2_dw" + self.input_name + " "
-                          + "sumDOS_" + x + "" + self.input_name + " "
+                          + "sumDOS_" + x + "_up" + self.input_name + " "
+                          + "sumDOS_" + x + "_dw" + self.input_name + " "
                           + "vs "
                           + "E_sumDOS_" + x + "" + self.input_name + "\n"
                           )
@@ -1169,7 +1177,8 @@ class Plotter(object):
                                + "pDOS_" + x + str(y + 1) + "_dxz_dw" + self.input_name + " "
                                + "pDOS_" + x + str(y + 1) + "_dx2_up" + self.input_name + " "
                                + "pDOS_" + x + str(y + 1) + "_dx2_dw" + self.input_name + " "
-                               + "pDOS_" + x + str(y + 1) + "" + self.input_name + " "
+                               + "pDOS_" + x + str(y + 1) + "_up" + self.input_name + " "
+                               + "pDOS_" + x + str(y + 1) + "_dw" + self.input_name + " "
                                )
                     tmpdisplay = ("X Display "
                                   + "pDOS_" + x + str(y + 1) + "_s_up" + self.input_name + " "
@@ -1190,7 +1199,8 @@ class Plotter(object):
                                   + "pDOS_" + x + str(y + 1) + "_dxz_dw" + self.input_name + " "
                                   + "pDOS_" + x + str(y + 1) + "_dx2_up" + self.input_name + " "
                                   + "pDOS_" + x + str(y + 1) + "_dx2_dw" + self.input_name + " "
-                                  + "pDOS_" + x + str(y + 1) + "" + self.input_name + " "
+                                  + "pDOS_" + x + str(y + 1) + "_up" + self.input_name + " "
+                                  + "pDOS_" + x + str(y + 1) + "_dw" + self.input_name + " "
                                   + "vs "
                                   + "E_pDOS_" + x + str(y + 1) + "" + self.input_name + " "
                                   + "as "
@@ -1487,7 +1497,7 @@ class Plotter(object):
                     # Wave part
                     for i in range(self.dosdata.nedos):
                         pdos.write(str(self.dosdata.pdos[count][i, 0]))
-                        for j in range(self.dosdata.numpdos + 1):
+                        for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
                             if j == 0:
                                 pass
                             else:
@@ -1519,7 +1529,7 @@ class Plotter(object):
                 # Wave part
                 for i in range(self.dosdata.nedos):
                     sumdos.write(str(self.dosdata.sumdos[count][i, 0]))
-                    for j in range(self.dosdata.numpdos + 1):
+                    for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
                         if j == 0:
                             pass
                         else:
@@ -1601,7 +1611,7 @@ class Plotter(object):
                     # Wave part
                     for i in range(self.dosdata.nedos):
                         dos.write(str(self.dosdata.pdos[count][i, 0]))
-                        for j in range(self.dosdata.numpdos + 1):
+                        for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
                             if j == 0:
                                 pass
                             else:
@@ -1620,7 +1630,7 @@ class Plotter(object):
                 # Wave part
                 for i in range(self.dosdata.nedos):
                     dos.write(str(self.dosdata.sumdos[k][i, 0]))
-                    for j in range(self.dosdata.numpdos + 1):
+                    for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
                         if j == 0:
                             pass
                         else:

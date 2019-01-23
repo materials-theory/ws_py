@@ -26,6 +26,7 @@ class DosParserV(object):
         self.emin = None
         self.nedos = None
         self.atoms = None
+        self.numpdos_add = 1
 
         self.ispin = int(self.outcar.param_from_outcar('ISPIN'))
         self.lorbit = int(self.outcar.param_from_outcar('LORBIT'))
@@ -50,6 +51,7 @@ class DosParserV(object):
         # 3 - E t in
         if self.ispin == 2 and self.lsorbit == "F":
             self.numtdos = 5
+            self.numpdos_add = 2
         else:
             self.numtdos = 3
 
@@ -113,7 +115,7 @@ class DosParserV(object):
         tdos_array = np.reshape(np.array(tdos_array, dtype='d'), (self.nedos, self.numtdos))
 
         # Multiplying -1 to down-spin tdos
-        if self.ispin == 2 and self.lsorbit == "F":
+        if self.numpdos_add == 2:
             tdos_array[:, 2] = tdos_array[:, 2] * -1
             tdos_array[:, 4] = tdos_array[:, 4] * -1
 
@@ -128,14 +130,31 @@ class DosParserV(object):
             tmp_array = []
             for j in range(self.nedos):
                 tmp_array.append(dos.pop(0).split())
-                tmp_array[j].append(str(np.sum(np.array(tmp_array[j], dtype='d')[1:])))
+                if self.numpdos_add == 2:
+                    up = []
+                    down = []
+                    for k in range(len(tmp_array[j])):
+                        if k == 0:
+                            pass
+                        else:
+                            if np.mod(k, 2) > 0:
+                                up.append(np.array(tmp_array[j][k], dtype='d'))
+                            else:
+                                down.append(np.array(tmp_array[j][k], dtype='d'))
+
+                    tmp_array[j].append(str(np.sum(np.array(up, dtype='d')[1:])))
+                    tmp_array[j].append(str(np.sum(np.array(down, dtype='d')[1:])))
+
+                else:
+                    tmp_array[j].append(str(np.sum(np.array(tmp_array[j], dtype='d')[1:])))
             pdos_array.append(tmp_array)
-        pdos_array = np.reshape(np.array(pdos_array, dtype='d'), (totalcount, self.nedos, self.numpdos + 1))
+
+        pdos_array = np.reshape(np.array(pdos_array, dtype='d'), (totalcount, self.nedos, self.numpdos + self.numpdos_add))
 
         # Multiplying -1 to down-spin pdos
-        if self.ispin == 2:
+        if self.numpdos_add == 2:
             for i in range(totalcount):
-                for j in range(self.numpdos + 1):
+                for j in range(self.numpdos + self.numpdos_add):
                     if j == 0:
                         pass
                     else:
@@ -158,7 +177,8 @@ class DosParserV(object):
             tmp_array[:, 0] = tmp_array[:, 0] / int(self.atoms[x])
             count += int(self.atoms[x])
             sumdos_array.append(tmp_array)
-        sumdos_array = np.reshape(sumdos_array, (self.numsumdos, self.nedos, self.numpdos + 1))
+
+        sumdos_array = np.reshape(sumdos_array, (self.numsumdos, self.nedos, self.numpdos + self.numpdos_add))
 
         self.tdos = tdos_array
         self.pdos = pdos_array
