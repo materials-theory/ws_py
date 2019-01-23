@@ -130,26 +130,17 @@ class DosParserV(object):
             tmp_array = []
             for j in range(self.nedos):
                 tmp_array.append(dos.pop(0).split())
-                if self.numpdos_add == 2:
-                    up = []
-                    down = []
-                    for k in range(len(tmp_array[j])):
-                        if k == 0:
-                            pass
-                        else:
-                            if np.mod(k, 2) > 0:
-                                up.append(np.array(tmp_array[j][k], dtype='d'))
-                            else:
-                                down.append(np.array(tmp_array[j][k], dtype='d'))
+            tmp_array = np.array(tmp_array, dtype='d')
 
-                    tmp_array[j].append(str(np.sum(np.array(up, dtype='d')[1:])))
-                    tmp_array[j].append(str(np.sum(np.array(down, dtype='d')[1:])))
+            if self.numpdos_add == 2:
+                up = tmp_array[:, 1::2].sum(1)
+                down = tmp_array[:, 2::2].sum(1)
+                tmp_array = np.column_stack((tmp_array, up, down))
+            else:
+                sum = tmp_array[:, 1:].sum(1)
+                tmp_array = np.column_stack((tmp_array, sum))
 
-                else:
-                    tmp_array[j].append(str(np.sum(np.array(tmp_array[j], dtype='d')[1:])))
             pdos_array.append(tmp_array)
-
-        pdos_array = np.reshape(np.array(pdos_array, dtype='d'), (totalcount, self.nedos, self.numpdos + self.numpdos_add))
 
         # Multiplying -1 to down-spin pdos
         if self.numpdos_add == 2:
@@ -159,7 +150,7 @@ class DosParserV(object):
                         pass
                     else:
                         if np.mod(j, 2) == 0:
-                            pdos_array[i, :, j] = pdos_array [i, :, j] * -1
+                            pdos_array[i][:, j] = pdos_array[i][:, j] * -1
                         else:
                             pass
 
