@@ -1454,28 +1454,20 @@ class Plotter(object):
             if self.outfile is None:
                 outfile = 'tDOS.itx'
             else:
-                outfile = 'tDOS_' + self.outfile + '.itx'
-            self.io = IO(None, outfile)
-            tdos = self.io.WriteFile()
+                outfile = self.outfile + '_tDOS.itx'
 
-            tdos.write("IGOR\n")
-            tdos.write("WAVES/D ")
-            tdos.write(tdosname)
-            tdos.write("\nBEGIN\n")
+            with open(outfile, "w") as tdos:
+                tdos.write("IGOR\n")
+                tdos.write("WAVES/D ")
+                tdos.write(tdosname)
+                tdos.write("\nBEGIN\n")
 
-            # Wave part
-            for i in range(self.dosdata.nedos):
-                tdos.write(str(self.dosdata.tdos[i, 0]))
-                for j in range(self.dosdata.numtdos):
-                    if j == 0:
-                        pass
-                    else:
-                        tdos.write(" " + str(self.dosdata.tdos[i, j]))
-                tdos.write("\n")
-            tdos.write("END\n")
+                # Wave part
+                np.savetxt(tdos, self.dosdata.tdos, fmt="%.10g", delimiter=" ", newline="\n")
+                tdos.write("END\n")
 
-            tdos.write(tdosdisplay)
-            tdos.write(preset)
+                tdos.write(tdosdisplay)
+                tdos.write(preset)
 
             # pDOS writing
             count = 0
@@ -1484,31 +1476,31 @@ class Plotter(object):
                     if self.outfile is None:
                         outfile = 'pDOS_' + x + str(y + 1) + ".itx"
                     else:
-                        outfile = 'pDOS_' + x + str(y + 1) + "_" + self.outfile + '.itx'
-                    self.io = IO(None, outfile)
-                    pdos = self.io.WriteFile()
+                        outfile = self.outfile + '_pDOS_' + x + str(y + 1) + '.itx'
 
-                    # Header part
-                    pdos.write("IGOR\n")
-                    pdos.write("WAVES/D ")
-                    pdos.write(pdosname[count])
-                    pdos.write("\nBEGIN\n")
+                    with open(outfile, "w") as pdos:
+                        # Header part
+                        pdos.write("IGOR\n")
+                        pdos.write("WAVES/D ")
+                        pdos.write(pdosname[count])
+                        pdos.write("\nBEGIN\n")
 
-                    # Wave part
-                    for i in range(self.dosdata.nedos):
-                        pdos.write(str(self.dosdata.pdos[count][i, 0]))
-                        for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
-                            if j == 0:
-                                pass
-                            else:
-                                pdos.write(" " + str(self.dosdata.pdos[count][i, j]))
-                        pdos.write("\n")
-                    pdos.write("END\n")
+                        # Wave part
+                        # for i in range(self.dosdata.nedos):
+                        #     pdos.write(str(self.dosdata.pdos[count][i, 0]))
+                        #     for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
+                        #         if j == 0:
+                        #             pass
+                        #         else:
+                        #             pdos.write(" " + str(self.dosdata.pdos[count][i, j]))
+                        #     pdos.write("\n")
+                        np.savetxt(pdos, self.dosdata.pdos[count], fmt="%.10g", delimiter=" ", newline="\n")
+                        pdos.write("END\n")
 
-                    pdos.write(pdosdisplay[count])
-                    pdos.write(preset)
+                        pdos.write(pdosdisplay[count])
+                        pdos.write(preset)
 
-                    count += 1
+                        count += 1
 
             # sumDOS writing
             count = 0
@@ -1516,132 +1508,70 @@ class Plotter(object):
                 if self.outfile is None:
                     outfile = 'sumDOS_' + x + ".itx"
                 else:
-                    outfile = 'sumDOS_' + x + "_" + self.outfile + '.itx'
-                self.io = IO(None, outfile)
-                sumdos = self.io.WriteFile()
+                    outfile = self.outfile + '_sumDOS_' + x + '.itx'
 
-                # Header part
-                sumdos.write("IGOR\n")
-                sumdos.write("WAVES/D ")
-                sumdos.write(sumdosname[count])
-                sumdos.write("\nBEGIN\n")
+                with open(outfile, "w") as sumdos:
+                    # Header part
+                    sumdos.write("IGOR\n")
+                    sumdos.write("WAVES/D ")
+                    sumdos.write(sumdosname[count])
+                    sumdos.write("\nBEGIN\n")
 
-                # Wave part
-                for i in range(self.dosdata.nedos):
-                    sumdos.write(str(self.dosdata.sumdos[count][i, 0]))
-                    for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
-                        if j == 0:
-                            pass
-                        else:
-                            sumdos.write(" " + str(self.dosdata.sumdos[count][i, j]))
-                    sumdos.write("\n")
-                sumdos.write("END\n")
+                    # Wave part
+                    np.savetxt(sumdos, self.dosdata.sumdos[count], fmt="%.10g", delimiter=" ", newline="\n")
+                    sumdos.write("END\n")
 
-                sumdos.write(sumdosdisplay[count])
-                sumdos.write(preset)
-                count += 1
+                    sumdos.write(sumdosdisplay[count])
+                    sumdos.write(preset)
+                    count += 1
 
         # When writing in a combined itx file
         else:
             if self.outfile is None:
                 outfile = 'dos.itx'
             else:
-                outfile = 'dos_' + self.outfile + '.itx'
+                outfile = self.outfile + '.itx'
 
-            self.io = IO(None, outfile)
-            dos = self.io.WriteFile()
-
-            # # Header part
-            # dos.write("IGOR\n")
-            # dos.write("WAVES/D ")
-            # dos.write(tdosname + " " + "".join(pdosname) + " " + " ".join(sumdosname))
-            # dos.write("\nBEGIN\n")
-            #
-            # # Wave part
-            # for i in range(self.dosdata.nedos):
-            #     dos.write(str(self.dosdata.tdos[i, 0]))
-            #     for j in range(self.dosdata.numtdos):
-            #         if j == 0:
-            #             pass
-            #         else:
-            #             dos.write(" " + str(self.dosdata.tdos[i, j]))
-            #
-            #     count = 0
-            #     for x in atom.keys():
-            #         for y in range(int(atom[x])):
-            #             for j in range(self.dosdata.numpdos + 1):
-            #                 dos.write(" " + str(self.dosdata.pdos[count][i, j]))
-            #         count += 1
-            #
-            #     count = 0
-            #     for k in range(len(atom.keys())):
-            #         for j in range(self.dosdata.numpdos + 1):
-            #             dos.write(" " + str(self.dosdata.sumdos[count][i, j]))
-            #         count += 1
-            #
-            #     dos.write("\n")
-            # dos.write("END\n")
-
-            dos.write("IGOR\n")
-            dos.write("WAVES/D ")
-            dos.write(tdosname)
-            dos.write("\nBEGIN\n")
+            with open(outfile, "w") as dos:
+                dos.write("IGOR\n")
+                dos.write("WAVES/D ")
+                dos.write(tdosname)
+                dos.write("\nBEGIN\n")
 
             # Wave part
-            for i in range(self.dosdata.nedos):
-                dos.write(str(self.dosdata.tdos[i, 0]))
-                for j in range(self.dosdata.numtdos):
-                    if j == 0:
-                        pass
-                    else:
-                        dos.write(" " + str(self.dosdata.tdos[i, j]))
-                dos.write("\n")
-            dos.write("END\n")
+                np.savetxt(dos, self.dosdata.tdos, fmt="%.10g", delimiter=" ", newline="\n")
+                dos.write("END\n")
 
             # pDOS writing
-            count = 0
-            for x in atom.keys():
-                for y in range(int(atom[x])):
+                count = 0
+                for x in atom.keys():
+                    for y in range(int(atom[x])):
 
+                        # Header part
+                        dos.write("WAVES/D ")
+                        dos.write(pdosname[count])
+                        dos.write("\nBEGIN\n")
+
+                        # Wave part
+                        np.savetxt(dos, self.dosdata.pdos[count],fmt="%.10g", delimiter=" ", newline="\n")
+                        dos.write("END\n")
+                        count += 1
+
+                # sumDOS writing
+                for k in range(self.dosdata.numsumdos):
                     # Header part
                     dos.write("WAVES/D ")
-                    dos.write(pdosname[count])
+                    dos.write(sumdosname[k])
                     dos.write("\nBEGIN\n")
 
                     # Wave part
-                    for i in range(self.dosdata.nedos):
-                        dos.write(str(self.dosdata.pdos[count][i, 0]))
-                        for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
-                            if j == 0:
-                                pass
-                            else:
-                                dos.write(" " + str(self.dosdata.pdos[count][i, j]))
-                        dos.write("\n")
+                    np.savetxt(dos, self.dosdata.sumdos[k],fmt="%.10g", delimiter=" ", newline="\n")
                     dos.write("END\n")
-                    count += 1
 
-            # sumDOS writing
-            for k in range(int(len(atom.keys()))):
-                # Header part
-                dos.write("WAVES/D ")
-                dos.write(sumdosname[k])
-                dos.write("\nBEGIN\n")
-
-                # Wave part
-                for i in range(self.dosdata.nedos):
-                    dos.write(str(self.dosdata.sumdos[k][i, 0]))
-                    for j in range(self.dosdata.numpdos + self.dosdata.numpdos_add):
-                        if j == 0:
-                            pass
-                        else:
-                            dos.write(" " + str(self.dosdata.sumdos[k][i, j]))
-                    dos.write("\n")
-                dos.write("END\n")
-
-            dos.write(tdosdisplayforcomb)
-            for i in range(len(sumdosappend)):
-                dos.write(sumdosappend[i])
-            dos.write(preset)
+                dos.write(tdosdisplayforcomb)
+                for i in range(len(sumdosappend)):
+                    dos.write(sumdosappend[i])
+                dos.write(preset)
 
         print("Done!")
         return
