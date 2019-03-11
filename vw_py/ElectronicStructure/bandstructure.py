@@ -32,6 +32,11 @@ class Bandstructure(object):
         self.traj = None
         self.emass_residuals = None
 
+        if Outcar.param_from_outcar("LORBIT") in ["11", "12"]:
+            self.numstates = 11
+        else:
+            self.numstates = 5
+
         return
 
     def band_data(self, fermi, fakeweight, shift):
@@ -280,25 +285,24 @@ class Bandstructure(object):
 
                 numatoms = len(atomnum)
                 # proj_atom = np.reshape(np.array(proj_atom), (len(atomnum), self.eigen.numstates, self.eigen.numkp, 5))
-
-        proj_atom = np.reshape(np.array(proj_atom), (numatoms, numbands, numkp, 5))
+            proj_atom = np.reshape(np.array(proj_atom), (numatoms, numbands, numkp, self.numstates))
 
         # Ion type - # of band - # of kp
         if orbital is False:
             for i in range(len(proj_atom)):
                 for j in range(numbands):
-                    proj_orb.append(proj_atom[i, j, :, 4])
+                    proj_orb.append(proj_atom[i, j, :, self.numstates])
 
             proj_orb = np.reshape(np.array(proj_orb), (numatoms, 1, numbands, numkp))
 
         # Ion type - type of orbital - # of band - # of kp
         elif orbital is True:
             for i in range(len(proj_atom)):
-                for k in range(4):
+                for k in range(self.numstates):
                     for j in range(numbands):
-                        proj_orb.append(proj_atom[i, j, :, k + 1])
+                        proj_orb.append(proj_atom[i, j, :, k])
 
-            proj_orb = np.reshape(np.array(proj_orb), (numatoms, 4, numbands, numkp))
+            proj_orb = np.reshape(np.array(proj_orb), (numatoms, self.numstates, numbands, numkp))
 
         self.path = path_conv
         self.proj = proj_orb
@@ -348,24 +352,24 @@ class Bandstructure(object):
 
                     numatoms = len(atomnum)
 
-            proj_atom = np.reshape(np.array(proj_atom), (numatoms, numbands, numkp, 5))
+            proj_atom = np.reshape(np.array(proj_atom), (numatoms, numbands, numkp, self.numstates))
 
             # Ion type - # of band - # of kp
             if orbital is False:
                 for i in range(len(proj_atom)):
                     for j in range(numbands):
-                        proj_orb.append(proj_atom[i, j, :, 4])
+                        proj_orb.append(proj_atom[i, j, :, self.numstates])
 
                 proj_orb = np.reshape(np.array(proj_orb), (numatoms, 1, numbands, numkp))
 
             # Ion type - type of orbital - # of band - # of kp
             elif orbital is True:
                 for i in range(len(proj_atom)):
-                    for k in range(4):
+                    for k in range(self.numstates):
                         for j in range(numbands):
-                            proj_orb.append(proj_atom[i, j, :, k + 1])
+                            proj_orb.append(proj_atom[i, j, :, k])
 
-                proj_orb = np.reshape(np.array(proj_orb), (numatoms, 4, numbands, numkp))
+                proj_orb = np.reshape(np.array(proj_orb), (numatoms, self.numstates, numbands, numkp))
 
             self.proj_mz = proj_orb
         return

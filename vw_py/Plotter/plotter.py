@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from vw_py.Parsers.outcarhandler import OutcarHandler as outcar
 from vw_py.IO.IO import IO
 from vw_py.ElectronicStructure.bandstructure import Bandstructure
 from vw_py.Parsers import xmlParserV as xml
@@ -244,7 +245,10 @@ class Plotter(object):
                 wavename_prefix.append([''])
 
             if orbital is True:
-                wavename_prefix.append(['s', 'p', 'd', 't'])
+                if outcar.param_from_outcar("LORBIT") in ["11", "12"]:
+                    wavename_prefix.append(['s', 'px', 'py', 'pz', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2' 't'])
+                else:
+                    wavename_prefix.append(['s', 'p', 'd', 't'])
 
             elif orbital is False:
                 wavename_prefix.append([''])
