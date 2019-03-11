@@ -103,7 +103,7 @@ class ProcarParserV:
                 path_array = np.reshape(path_array, (self.numkp, 3))
                 wgt_array = np.reshape(wgt_array, (self.numkp, 1))
 
-                if outcar.param_from_outcar('LORBIT') is [11, 12]:
+                if outcar.param_from_outcar('LORBIT') is ["11", "12"]:
                     proj_array = np.reshape(proj_array, (self.numkp, self.numstates, self.numions + 1, 11))
                 else:
                     proj_array = np.reshape(proj_array, (self.numkp, self.numstates, self.numions + 1, 5))
