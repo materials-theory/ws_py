@@ -27,6 +27,7 @@ class ProcarParserV:
 
         return
 
+    #TODO: LORBIT handling issue
     def parser(self, spin):
         print("Reading VASP PROCAR file...")
         with open(self.filename, 'r') as filestr:
@@ -101,7 +102,11 @@ class ProcarParserV:
                 states_array = np.reshape(states_array, (self.numkp, self.numstates))
                 path_array = np.reshape(path_array, (self.numkp, 3))
                 wgt_array = np.reshape(wgt_array, (self.numkp, 1))
-                proj_array = np.reshape(proj_array, (self.numkp, self.numstates, self.numions + 1, 5))
+
+                if outcar.param_from_outcar('LORBIT') is [11, 12]:
+                    proj_array = np.reshape(proj_array, (self.numkp, self.numstates, self.numions + 1, 11))
+                else:
+                    proj_array = np.reshape(proj_array, (self.numkp, self.numstates, self.numions + 1, 5))
 
             if spin is True:
                 proj_tot = []
