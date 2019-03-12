@@ -190,5 +190,6 @@ venv.bak/
 .mypy_cache/
 
 # custom
-*test
+*test*
 *examples*
+vw_py

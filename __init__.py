@@ -1,0 +1,6 @@
+__author__ = "Woosun Jang"
+__maintainer__ = "Woosun Jang"
+__email__ = "woosunjang@fhi-berlin.mpg.de"
+__status__ = "Developing"
+__date__ =  "20190312"
+__version__ = "2.0"
