@@ -1,10 +1,10 @@
-import xml.etree.ElementTree as ET
-import numpy as np
+import xml.etree.cElementTree as et
 
 
+# TODO: using lxml object than etree to handle larger xml files
 class Vasprun(object):
 
-    def __init__(self, infile, skip_info=False):
+    def __init__(self, infile, parse_eig=True, parse_dos=True, parse_pband=True):
         self.infile = infile
         self.generator = None
         self.incar = None
@@ -14,16 +14,14 @@ class Vasprun(object):
         self.init_structure = None
         self.fin_structure = None
         self.prim_structure = None
-        self.calculation = None
+        self.energy = None
+        self.time = {}
+        self.calculation = {}
 
-        # tree = ET.parse(infile)
-        # root = tree.getroot()
+        self._parse_xml(self.infile, parse_eig, parse_dos, parse_pband)
 
-        if skip_info is False:
-            self._parse_info(self.infile)
-
-    def _parse_info(self, infile):
-        for event, elem in ET.iterparse(infile):
+    def _parse_xml(self, infile, parse_eig, parse_dos, parse_pband):
+        for event, elem in et.iterparse(infile):
             if elem.tag == "generator":
                 self.generator = self._parse_elem(elem)
             elif elem.tag == "incar":
@@ -34,28 +32,56 @@ class Vasprun(object):
                 self.parameters = self._parse_elem(elem)
             elif elem.tag == "atominfo":
                 self.atominfo = self._parse_elem(elem)
-                # pass
             elif elem.tag == "structure":
-                if elem.attrib["name"] == "initialpos":
+                if elem.get("name") == "initialpos":
                     self.init_structure = self._parse_elem(elem)
-                elif elem.attrib["name"] == "finalpos":
+                elif elem.get("name") == "finalpos":
                     self.fin_structure = self._parse_elem(elem)
-                elif elem.attrib["name"] == "primitive_cell":
+                elif elem.get("name") == "primitive_cell":
                     self.prim_structure = self._parse_elem(elem)
+                else:
+                    pass
+
+            elif elem.tag == "calculation":
+                for elem2 in elem:
+                    if elem2.tag == "scstep":
+                        pass
+                    elif elem2.tag == "structure":
+                        pass
+                    elif elem2.tag == "energy":
+                        self.energy = self._parse_elem(elem2)
+                    elif elem2.tag == "time":
+                        timetype = elem2.get("name")
+                        self.time[timetype] = list(map(float, elem2.text.split()))
+                    elif elem2.tag == "eigenvalues":
+                        if parse_eig is True:
+                            self.calculation["eigenvalues"] = self._parse_elem(elem2)["array"]
+                    elif elem2.tag == "separator":
+                        name = elem2.get("name")
+                        self.calculation[name] = self._parse_elem(elem2)
+                    elif elem2.tag == "dos":
+                        if parse_dos is True:
+                            tmp = self._parse_elem(elem2)
+                            self.calculation["total_dos"] = tmp["total"]["array"]
+                            self.calculation["partial_dos"] = tmp["partial"]["array"]
+                            tmp = None
+                    elif elem2.tag == "projected":
+                        if parse_pband is True:
+                            tmp = self._parse_elem(elem2)
+                            self.calculation["pband"] = tmp["array"]
+
         return
 
-    def _parse_calc(self):
-        return
-
-    def _parse_keys(self, tag, type, key):
-        if tag in ["v"]:
-            if type == "string":
+    @staticmethod
+    def _parse_keys(tag, keytype, key):
+        if tag in ["v", "c"]:
+            if keytype == "string":
                 return list(map(str, key.split()))
 
-            elif type == "logical":
+            elif keytype == "logical":
                 return list(map(bool, key.split()))
 
-            elif type == "int":
+            elif keytype == "int":
                 return list(map(int, key.split()))
 
             else:
@@ -65,13 +91,13 @@ class Vasprun(object):
             return list(map(float, key.split()))
 
         elif tag in ["i"]:
-            if type == "string":
+            if keytype == "string":
                 if key is None:
                     return None
                 else:
                     return key.strip(" ")
 
-            elif type == "logical":
+            elif keytype == "logical":
                 if "T" in key or ".t" in key:
                     return True
                 elif "F" in key or ".f" in key:
@@ -79,11 +105,14 @@ class Vasprun(object):
                 else:
                     raise TypeError("Unknown logical key value...")
 
-            elif type == "int":
+            elif keytype == "int":
                 return int(key)
 
             else:
                 return float(key)
+
+        else:
+            raise ValueError("Unknown input tag...")
 
     def _parse_elem(self, elem, recursive_root=None):
         parsed = {}
@@ -97,42 +126,31 @@ class Vasprun(object):
                     elif x.get("name") is not None:
                         root = x.get("name")
                     elif len(list(x)) == 0:
-                        # parsed[x.tag] = self._parse_values(x.type, x.text)
                         root = None
-
-                        # if x.tag in ["dimension", "field"]:
-                        #     pass
-                        # elif x.tag in ["set"]:
-                        #     parsed[x.tag] = self._parse_set(x)
-                        # else:
-                        #     parsed[x.tag] = self._parse_values(None, x.text)
-                        # root = None
+                    else:
+                        root = x.tag
 
                     if root is not None:
                         parsed_recursive = self._parse_elem(x, root)
-                        # parsed[root] = parsed_recursive[root]
+                        parsed[root] = parsed_recursive
 
                 else:
-                    type = x.get("type")
+                    elemtype = x.get("type")
                     if x.get("name") is not None:
                         name = x.get("name")
                     else:
                         name = x.tag
 
-                    if x.tag == "i":
-                        parsed[name] = self._parse_values(type, x.text)
-                    elif x.tag == "v":
-                        parsed[name] = self._parse_array(type, x.text)
+                    parsed[name] = self._parse_keys(x.tag, elemtype, x.text)
 
         else:
             if elem.tag == "varray":
                 v = []
                 for x in elem:
-                    v.append(self._parse_array(x.get("type"), x.text))
-                parsed[recursive_root] = v
+                    v.append(self._parse_keys(x.tag, x.get("type"), x.text))
+                parsed = v
 
             elif elem.tag == "array":
-                a = []
                 dim = []
                 field = []
                 for x in elem:
@@ -141,37 +159,31 @@ class Vasprun(object):
                     elif x.tag == "field":
                         field.append([x.text, x.get("type")])
                     elif x.tag == "set":
-                        if x.get("comment") is None:
-                            self._parse_set(x, None)
-                        else:
-                            root = x.get("comment")
-                            self._parse_set(x, root)
-                        # a.append(root)
-
+                        parsed[dim[0]] = self._parse_set(x)
+                        parsed["dimension"] = dim
+                        parsed["field"] = field
 
             else:
-                parsed[recursive_root] = self._parse_elem(elem)
-
+                parsed = self._parse_elem(elem)
+        elem.clear()
         return parsed
 
-    def _parse_elem_tag_exception(self, elem, tag):
-        return
-
-    def _parse_set(self, set, recursive_root):
+    def _parse_set(self, set_to_parse):
+        parsed = {}
         s = []
-        if recursive_root is None:
-            for x in set:
-                if x.tag in ["r"]:
-                    s.append(self._parse_array())
-                elif x.tag in ["c"]:
-                    s.append(self._parse_)
-                elif x.tag in ["rc"]:
-                    pass
-                elif x.tag in ["set"]:
-                    pass
+        for x in set_to_parse:
+            if x.tag == "set":
+                root = x.get("comment").replace(" ", "_")
+                parsed[root] = self._parse_set(x)
+            elif x.tag in ["r", "c"]:
+                s.append(self._parse_keys(x.tag, x.get("type"), x.text))
+            elif x.tag in ["rc"]:
+                rc = []
+                for y in x:
+                    rc.append(self._parse_keys(y.tag, y.get("type"), y.text))
+                s.append(rc)
 
+        if len(s) != 0:
+            parsed = s
 
-
-        return
-
-
+        return parsed
