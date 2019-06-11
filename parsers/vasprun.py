@@ -1,7 +1,8 @@
 import xml.etree.cElementTree as et
 
+from handlers.structure import AtomicStructure
 
-# TODO: using lxml object than etree to handle larger xml files
+# TODO: make all dicts to list for memory management -> maybe transfer back to dicts using to_dict
 class Vasprun(object):
 
     def __init__(self, infile, parse_eig=True, parse_dos=True, parse_pband=True):
@@ -13,7 +14,6 @@ class Vasprun(object):
         self.atominfo = None
         self.init_structure = None
         self.fin_structure = None
-        self.prim_structure = None
         self.energy = None
         self.time = {}
         self.calculation = {}
@@ -32,15 +32,15 @@ class Vasprun(object):
                 self.parameters = self._parse_elem(elem)
             elif elem.tag == "atominfo":
                 self.atominfo = self._parse_elem(elem)
+                simple = []
+                for x in self.atominfo["atomtypes"]["type"]:
+                    simple.append([x[1][0], x[0][0]])
+                self.atominfo["simple"] = simple
             elif elem.tag == "structure":
                 if elem.get("name") == "initialpos":
-                    self.init_structure = self._parse_elem(elem)
+                    self.init_structure = self._parse_structure(elem)
                 elif elem.get("name") == "finalpos":
-                    self.fin_structure = self._parse_elem(elem)
-                elif elem.get("name") == "primitive_cell":
-                    self.prim_structure = self._parse_elem(elem)
-                else:
-                    pass
+                    self.fin_structure = self._parse_structure(elem)
 
             elif elem.tag == "calculation":
                 for elem2 in elem:
@@ -53,22 +53,18 @@ class Vasprun(object):
                     elif elem2.tag == "time":
                         timetype = elem2.get("name")
                         self.time[timetype] = list(map(float, elem2.text.split()))
-                    elif elem2.tag == "eigenvalues":
-                        if parse_eig is True:
-                            self.calculation["eigenvalues"] = self._parse_elem(elem2)["array"]
+                    elif elem2.tag == "eigenvalues" and parse_eig is True:
+                        self.calculation["eigenvalues"] = self._parse_elem(elem2)["array"]
                     elif elem2.tag == "separator":
                         name = elem2.get("name")
                         self.calculation[name] = self._parse_elem(elem2)
-                    elif elem2.tag == "dos":
-                        if parse_dos is True:
-                            tmp = self._parse_elem(elem2)
-                            self.calculation["total_dos"] = tmp["total"]["array"]
-                            self.calculation["partial_dos"] = tmp["partial"]["array"]
-                            tmp = None
-                    elif elem2.tag == "projected":
-                        if parse_pband is True:
-                            tmp = self._parse_elem(elem2)
-                            self.calculation["pband"] = tmp["array"]
+                    elif elem2.tag == "dos" and parse_dos is True:
+                        tmp = self._parse_elem(elem2)
+                        self.calculation["total_dos"] = tmp["total"]["array"]
+                        self.calculation["partial_dos"] = tmp["partial"]["array"]
+                        tmp = None
+                    elif elem2.tag == "projected" and parse_pband is True:
+                        self.calculation["pband"] = self._parse_elem(elem2)["array"]
 
         return
 
@@ -155,9 +151,9 @@ class Vasprun(object):
                 field = []
                 for x in elem:
                     if x.tag == "dimension":
-                        dim.append(x.text)
+                        dim.append(x.text.strip())
                     elif x.tag == "field":
-                        field.append([x.text, x.get("type")])
+                        field.append([x.text.strip(), x.get("type")])
                     elif x.tag == "set":
                         parsed[dim[0]] = self._parse_set(x)
                         parsed["dimension"] = dim
@@ -186,4 +182,15 @@ class Vasprun(object):
         if len(s) != 0:
             parsed = s
 
+        return parsed
+
+    def _parse_structure(self, elem):
+        structure = self._parse_elem(elem)
+        if "selective" not in structure.keys():
+            selective = None
+        else:
+            selective = structure["selective"]
+
+        parsed = AtomicStructure(None, structure["crystal"]["basis"], self.atominfo["simple"],
+                                 False, structure["positions"], selective)
         return parsed
