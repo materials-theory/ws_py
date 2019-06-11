@@ -193,5 +193,4 @@ venv.bak/
 *test*
 *examples*
 vw_py
-/examples/
-/tests/
+.idea/
