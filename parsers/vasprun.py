@@ -3,6 +3,8 @@ import xml.etree.cElementTree as et
 from handlers.structure import AtomicStructure
 
 # TODO: make all dicts to list for memory management -> maybe transfer back to dicts using to_dict
+
+
 class Vasprun(object):
 
     def __init__(self, infile, parse_eig=True, parse_dos=True, parse_pband=True):
@@ -58,11 +60,13 @@ class Vasprun(object):
                     elif elem2.tag == "separator":
                         name = elem2.get("name")
                         self.calculation[name] = self._parse_elem(elem2)
-                    elif elem2.tag == "dos" and parse_dos is True:
-                        tmp = self._parse_elem(elem2)
-                        self.calculation["total_dos"] = tmp["total"]["array"]
-                        self.calculation["partial_dos"] = tmp["partial"]["array"]
-                        tmp = None
+                    elif elem2.tag == "dos":
+                        self.energy["e_fermi"] = float(elem2.find("i").text)
+                        if parse_dos is True:
+                            tmp = self._parse_elem(elem2)
+                            self.calculation["total_dos"] = tmp["total"]["array"]
+                            self.calculation["partial_dos"] = tmp["partial"]["array"]
+                            tmp = None
                     elif elem2.tag == "projected" and parse_pband is True:
                         self.calculation["pband"] = self._parse_elem(elem2)["array"]
 
@@ -81,7 +85,10 @@ class Vasprun(object):
                 return list(map(int, key.split()))
 
             else:
-                return list(map(str, key.split()))
+                if tag in ["c"]:
+                    return list(map(str, key.split()))
+                else:
+                    return list(map(float, key.split()))
 
         elif tag in ["r"]:
             return list(map(float, key.split()))
@@ -191,6 +198,38 @@ class Vasprun(object):
         else:
             selective = structure["selective"]
 
-        parsed = AtomicStructure(None, structure["crystal"]["basis"], self.atominfo["simple"],
-                                 False, structure["positions"], selective)
+        parsed = AtomicStructure(None, structure["crystal"]["basis"], self.atominfo["atoms"]["ion"],
+                                 self.atominfo["simple"], False, structure["positions"], selective)
         return parsed
+
+    def to_dic(self, title="vaspcalc", initstruc=False, parameters=False, band=False, pband=False, dos=False):
+        dic = {"title": title,
+               "version": self.generator["version"],
+               "incar": self.incar,
+               "kpoints": {"list": self.kpoints["kpointlist"],
+                           "weight": self.kpoints["weights"]},
+               "atominfo": {"simple": self.atominfo["simple"],
+                            "full": self.atominfo["atoms"]},
+               "energy": self.energy,
+               "time": self.time["totalsc"][-1],
+               "structure": self.fin_structure,
+               }
+
+        potcar = {}
+        for x in self.atominfo["atomtypes"]["type"]:
+            potcar[x[1][0]] = [x[-1], x[2][0], x[3][0]]
+        dic["potcar"] = potcar
+
+        if initstruc is True:
+            dic["structure_init"] = self.init_structure
+        if parameters is True:
+            dic["parameters"] = self.parameters
+        if band is True:
+            dic["band"] = self.calculation["eigenvalues"]
+        if pband is True:
+            dic["pband"] = self.calculation["pband"]
+        if dos is True:
+            dic["dos"] = {"tdos": self.calculation["total_dos"],
+                          "pdos": self.calculation["partial_dos"]
+                          }
+        return dic
