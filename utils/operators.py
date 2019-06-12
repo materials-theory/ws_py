@@ -77,7 +77,7 @@ def volume(unitvec):
     Returns : float
     """
 
-    vol = dot(unitvec[0], cross(unitvec[1], unitvec[2]))
+    vol = np.dot(unitvec[0], np.cross(unitvec[1], unitvec[2]))
 
     return vol
 
@@ -91,11 +91,11 @@ def recvec(unitvec):
     Returns : np array
     """
 
-    astar = cross(unitvec[1], unitvec[2]) / volume(unitvec)
-    bstar = cross(unitvec[2], unitvec[0]) / volume(unitvec)
-    cstar = cross(unitvec[0], unitvec[1]) / volume(unitvec)
+    astar = (np.cross(unitvec[1], unitvec[2]) / volume(unitvec)).tolist()
+    bstar = (np.cross(unitvec[2], unitvec[0]) / volume(unitvec)).tolist()
+    cstar = (np.cross(unitvec[0], unitvec[1]) / volume(unitvec)).tolist()
 
-    return np.array([astar, bstar, cstar])
+    return [astar, bstar, cstar]
 
 
 def directtocartesian(unitvec, posdata):
