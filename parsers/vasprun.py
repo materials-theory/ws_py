@@ -1,3 +1,4 @@
+import numpy as np
 import xml.etree.cElementTree as et
 
 from handlers.structure import AtomicStructure
@@ -66,9 +67,11 @@ class Vasprun(object):
                             tmp = self._parse_elem(elem2)
                             self.calculation["total_dos"] = tmp["total"]["array"]
                             self.calculation["partial_dos"] = tmp["partial"]["array"]
+                            # self._to_np_array(self.calculation["partial_dos"]["gridpoints"])
                             tmp = None
                     elif elem2.tag == "projected" and parse_pband is True:
                         self.calculation["pband"] = self._parse_elem(elem2)["array"]
+                        # self._to_np_array(self.calculation["pband"]["ion"])
 
         return
 
@@ -201,6 +204,14 @@ class Vasprun(object):
         parsed = AtomicStructure(None, structure["crystal"]["basis"], self.atominfo["atoms"]["ion"],
                                  self.atominfo["simple"], False, structure["positions"], selective)
         return parsed
+
+    def _to_np_array(self, dict, recursive_root=None):
+        for root, x in dict.items():
+            if type(x) is list:
+                dict[root] = np.array(dict[root])
+            else:
+                self._to_np_array(x, root)
+
 
     def to_dic(self, title="vaspcalc", initstruc=False, parameters=False, band=False, pband=False, dos=False):
         dic = {"title": title,
