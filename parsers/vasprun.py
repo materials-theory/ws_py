@@ -205,12 +205,12 @@ class Vasprun(object):
                                  self.atominfo["simple"], False, structure["positions"], selective)
         return parsed
 
-    def _to_np_array(self, dict, recursive_root=None):
+    def _to_np_array(self, dict):
         for root, x in dict.items():
             if type(x) is list:
                 dict[root] = np.array(dict[root])
             else:
-                self._to_np_array(x, root)
+                self._to_np_array(x)
 
 
     def to_dic(self, title="vaspcalc", initstruc=False, parameters=False, band=False, pband=False, dos=False):
