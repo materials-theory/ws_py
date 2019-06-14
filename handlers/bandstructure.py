@@ -22,21 +22,7 @@ class Bandstructure(object):
 
         self.projection_spin_rename()
 
-        b = self.projection_atom(self.projected, [[1, 2, 3, 4], [6, 7, 8, 9], [5, 10, 11]])
-        c = self.projection_orbital(b, [["s", "p"]], True, True)
-        d = self.eigen_reformat()
-        a = self.get_plot_dict(d, c)
         return
-
-    def band_reformat(self, band_dict):
-        reformatted = []
-        for x in self.eigenvalues["band"].keys():
-            for y in self.eigenvalues["band"][x].keys():
-                tmp = []
-                for z in self.eigenvalues["band"][x][y]:
-                    tmp.append(z[0])
-                reformatted.append(tmp)
-        return list(zip(*reformatted))
 
     def nested_dict(self):
         return defaultdict(self.nested_dict)
@@ -54,7 +40,6 @@ class Bandstructure(object):
     def projection_spin_rename(self):
         for i in range(len(self.projected["ion"])):
             self.projected["ion"]["spin_" + str(i + 1)] = self.projected["ion"].pop("spin" + str(i + 1))
-
 
     def projection_atom(self, target, atom_group=None, proj_others=True):
         to_sum = []
@@ -196,8 +181,10 @@ class Bandstructure(object):
         gap = (self.cbm()[0] - self.vbm()[0], [vbm[2], cbm[2]])
         return gap
 
-    def get_plot_dict(self, eig, proj={}):
-        count = 0
+    def get_plot_dict(self, eig, proj=None):
+        if proj is None:
+            proj = {}
+
         to_shift = 0.0
 
         if self.shift is None:
