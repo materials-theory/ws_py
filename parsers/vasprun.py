@@ -67,11 +67,9 @@ class Vasprun(object):
                             tmp = self._parse_elem(elem2)
                             self.calculation["total_dos"] = tmp["total"]["array"]
                             self.calculation["partial_dos"] = tmp["partial"]["array"]
-                            # self._to_np_array(self.calculation["partial_dos"]["gridpoints"])
                             tmp = None
                     elif elem2.tag == "projected" and parse_pband is True:
                         self.calculation["pband"] = self._parse_elem(elem2)["array"]
-                        # self._to_np_array(self.calculation["pband"]["ion"])
 
         return
 
@@ -205,13 +203,12 @@ class Vasprun(object):
                                  self.atominfo["simple"], False, structure["positions"], selective)
         return parsed
 
-    def _to_np_array(self, dict):
-        for root, x in dict.items():
+    def _to_np_array(self, d):
+        for root, x in d.items():
             if type(x) is list:
-                dict[root] = np.array(dict[root])
+                d[root] = np.array(d[root])
             else:
                 self._to_np_array(x)
-
 
     def to_dic(self, title="vaspcalc", initstruc=False, parameters=False, band=False, pband=False, dos=False):
         dic = {"title": title,
