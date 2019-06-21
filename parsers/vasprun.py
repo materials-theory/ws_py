@@ -1,6 +1,7 @@
 import numpy as np
 import xml.etree.cElementTree as et
 
+from collections import defaultdict
 from handlers.structure import AtomicStructure
 
 # TODO: make all dicts to list for memory management -> maybe transfer back to dicts using to_dict
@@ -58,6 +59,7 @@ class Vasprun(object):
                         self.time[timetype] = list(map(float, elem2.text.split()))
                     elif elem2.tag == "eigenvalues" and parse_eig is True:
                         self.calculation["eigenvalues"] = self._parse_elem(elem2)["array"]
+                        self.eig_spin_reformat()
                     elif elem2.tag == "separator":
                         name = elem2.get("name")
                         self.calculation[name] = self._parse_elem(elem2)
@@ -65,11 +67,12 @@ class Vasprun(object):
                         self.energy["e_fermi"] = float(elem2.find("i").text)
                         if parse_dos is True:
                             tmp = self._parse_elem(elem2)
-                            self.calculation["total_dos"] = tmp["total"]["array"]
-                            self.calculation["partial_dos"] = tmp["partial"]["array"]
-                            tmp = None
+                            self.calculation["total_dos"] = tmp["total"].pop("array")
+                            self.calculation["partial_dos"] = tmp["partial"].pop("array")
+
                     elif elem2.tag == "projected" and parse_pband is True:
                         self.calculation["pband"] = self._parse_elem(elem2)["array"]
+                        self.proj_spin_reformat()
 
         return
 
@@ -199,7 +202,7 @@ class Vasprun(object):
         else:
             selective = structure["selective"]
 
-        parsed = AtomicStructure(None, structure["crystal"]["basis"], self.atominfo["atoms"]["ion"],
+        parsed = AtomicStructure(structure["crystal"]["basis"], self.atominfo["atoms"]["ion"],
                                  self.atominfo["simple"], False, structure["positions"], selective)
         return parsed
 
@@ -209,6 +212,45 @@ class Vasprun(object):
                 d[root] = np.array(d[root])
             else:
                 self._to_np_array(x)
+
+    def nested_dict(self):
+        return defaultdict(self.nested_dict)
+
+    def eig_spin_reformat(self):
+        if len(self.calculation["eigenvalues"]["band"]) == 1:
+            self.calculation["eigenvalues"]["band"][""] = self.calculation["eigenvalues"]["band"].pop("spin_1")
+        elif len(self.calculation["eigenvalues"]["band"]) == 2:
+            self.calculation["eigenvalues"]["band"]["up"] = self.calculation["eigenvalues"]["band"].pop("spin_1")
+            self.calculation["eigenvalues"]["band"]["down"] = self.calculation["eigenvalues"]["band"].pop("spin_2")
+        elif len(self.calculation["eigenvalues"]["band"]) == 4:
+            self.calculation["eigenvalues"]["band"]["mx"] = self.calculation["eigenvalues"]["band"].pop("spin_1")
+            self.calculation["eigenvalues"]["band"]["my"] = self.calculation["eigenvalues"]["band"].pop("spin_2")
+            self.calculation["eigenvalues"]["band"]["mz"] = self.calculation["eigenvalues"]["band"].pop("spin_3")
+            self.calculation["eigenvalues"]["band"]["tot"] = self.calculation["eigenvalues"]["band"].pop("spin_4")
+        else:
+            raise KeyError("Invalid spin part!")
+
+        reformatted = self.nested_dict()
+
+        for spin, x in self.calculation["eigenvalues"]["band"].items():
+            for kp, y in x.items():
+                for band_idx, values in enumerate(y):
+                    reformatted[spin][kp]["band_" + str(band_idx + 1)] = values[0]
+        self.calculation["eigenvalues"] = reformatted
+
+    def proj_spin_reformat(self):
+        if len(self.calculation["eigenvalues"]) == 1:
+            self.calculation["pband"]["ion"][""] = self.calculation["pband"]["ion"].pop("spin1")
+        elif len(self.calculation["eigenvalues"]) == 2:
+            self.calculation["pband"]["ion"]["up"] = self.calculation["pband"]["ion"].pop("spin1")
+            self.calculation["pband"]["ion"]["down"] = self.calculation["pband"]["ion"].pop("spin2")
+        elif len(self.calculation["eigenvalues"]) == 4:
+            self.calculation["pband"]["ion"]["mx"] = self.calculation["pband"]["ion"].pop("spin1")
+            self.calculation["pband"]["ion"]["my"] = self.calculation["pband"]["ion"].pop("spin2")
+            self.calculation["pband"]["ion"]["mz"] = self.calculation["pband"]["ion"].pop("spin3")
+            self.calculation["pband"]["ion"]["tot"] = self.calculation["pband"]["ion"].pop("spin4")
+        else:
+            raise KeyError("Invalid spin part!")
 
     def to_dic(self, title="vaspcalc", initstruc=False, parameters=False, band=False, pband=False, dos=False):
         dic = {"title": title,
