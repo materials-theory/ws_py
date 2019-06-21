@@ -3,11 +3,12 @@ import parsers
 
 from utils import operators
 
+
 class AtomicStructure(object):
 
-    def __init__(self, header: str = "structure", unitcell: list = None, elements: list = None,
+    def __init__(self, unitcell: list = None, elements: list = None,
                  elements_simple: list = None, coord_cart: bool = False, coords: list = None,
-                 seldyn: list = None, others: dict = None):
+                 seldyn: list = None, others: dict = None, header: str = "structure"):
         self.header = header
         self.unitcell = unitcell
         self.elements = elements
