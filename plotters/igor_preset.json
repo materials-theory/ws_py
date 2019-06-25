@@ -16,7 +16,7 @@
                  "zero(bottom)": 0,
                  "zeroThick(left)": 2.5
                  },
- "Label": {"left": "\"\Z28 Energy (eV)\""
+ "Label": {"left": "\"\\Z28 Energy (eV)\""
            },
  "SetAxis": {"left": "-3, 3"
              }
