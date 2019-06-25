@@ -8,7 +8,7 @@ class Bandstructure(object):
 
     def __init__(self, eigenvalues: dict = None, projection: dict = None, ktrace: list = None,
                  structure: object = None, efermi: float = None, shift="vbm",
-                 kweight: list = None, atom: list = None, orbital: list = None):
+                 kweight: list = None, atom: list = None, orbital: list = None, ymin: float = None, ymax: float = None):
         self.eigenvalues = eigenvalues
         self.projection = projection
         self.ktrace = ktrace
@@ -18,6 +18,8 @@ class Bandstructure(object):
         self.kweight = kweight
         self.atom = atom
         self.orbital = orbital
+        self.ymin = ymin
+        self.ymax = ymax
         self.metal = False
         self.shifted = False
         self.projected = {}
@@ -25,14 +27,11 @@ class Bandstructure(object):
 
         self.shift_band()
 
+        if ymin or ymax:
+            self.apply_window(ymin, ymax)
+
         if projection is not None:
             self.projected = self.projection_orbital(self.projection_atom(self.projection, self.atom), self.orbital)
-            # if atom is not None and orbital is not None:
-            #     self.projected = self.projection_orbital(self.projection_atom(self.projection, self.atom), self.orbital)
-            # elif atom is not None and orbital is None:
-            #     self.projected = self.projection_atom(self.projection, self.atom)
-            # elif atom is None and orbital is not None:
-            #     self.projected = self.projection_orbital(self.projection, self.orbital)
 
     def nested_dict(self):
         return defaultdict(self.nested_dict)
@@ -52,14 +51,14 @@ class Bandstructure(object):
                         # to_sum.append(re.findall(r"[\w']+", x))
                         to_sum.append([int(x) - 1])
 
-        elif proj_others is True and atom_group is not None:
-            tmp = []
-            for i in range(1, len(self.structure.elements)):
-                if i not in [a for b in to_sum for a in b]:
-                    tmp.append(i)
-            if tmp:
-                to_sum.append(tmp)
-                atom_group.append("others")
+            if proj_others is True:
+                tmp = []
+                for i in range(1, len(self.structure.elements)):
+                    if i not in [a for b in to_sum for a in b]:
+                        tmp.append(i)
+                if tmp:
+                    to_sum.append(tmp)
+                    atom_group.append("others")
 
         elif atom_group is None:
             to_sum = [[idx for idx in range(len(self.structure.elements))]]
@@ -90,8 +89,15 @@ class Bandstructure(object):
                     for band, items in z.items():
                         projected[group][spin][kp][band] = items.tolist()
 
-        self.proj_info["atom"] = to_sum
-        self.proj_info["atom_input"] = atom_group
+        for i in range(len(atom_group)):
+            if type(atom_group[i]) is str:
+                atom_group[i] = atom_group[i].replace("-", "to")
+            elif type(atom_group[i]) is list:
+                tmp = ""
+                for x in atom_group[i]:
+                    tmp = tmp + x + "_"
+                atom_group[i] = tmp.rstrip("_")
+        self.proj_info["atom_group"] = atom_group
         return projected
 
     # TODO: need to simplify...
@@ -107,13 +113,14 @@ class Bandstructure(object):
                 else:
                     to_sum.append(re.findall(r"[\w']+", x))
 
-        if proj_others is True and orbital is not None:
-            tmp = []
-            for x in self.projection["field"]:
-                if x[0] not in [a for b in to_sum for a in b]:
-                    tmp.append(x[0])
-            to_sum.append(tmp)
-            orbital.append(tmp)
+            if proj_others is True:
+                tmp = []
+                for x in self.projection["field"]:
+                    if x[0] not in [a for b in to_sum for a in b]:
+                        tmp.append(x[0])
+                if tmp:
+                    to_sum.append(tmp)
+                    orbital.append(tmp)
 
         if total is True:
             to_sum.append([x for orb in self.projection["field"] for x in orb[0]])
@@ -130,27 +137,16 @@ class Bandstructure(object):
                 for kp, z in y.items():
                     for band, occ in z.items():
                         for orb_group_idx, orb_group in enumerate(to_sum):
+                            projected[group]["orb_group_" + str(orb_group_idx)][spin][kp][band] = 0
                             for orb in orb_group:
-                                if len(to_sum) == 1:
-                                    if type(projected[group][""][spin][kp][band]) is not np.ndarray:
-                                        projected[group][""][spin][kp][band] = np.array(occ[orb[1]])
-                                    else:
-                                        projected[group][""][spin][kp][band] += np.array(occ[orb[1]])
-                                else:
-                                    if type(projected[group]["orb_group_" + str(orb_group_idx)][spin][kp][band]) is not np.ndarray:
-                                        projected[group]["orb_group_" + str(orb_group_idx)][spin][kp][band] = np.array(occ[orb[1]])
-                                    else:
-                                        projected[group]["orb_group_" + str(orb_group_idx)][spin][kp][band] += np.array(occ[orb[1]])
+                                projected[group]["orb_group_" + str(orb_group_idx)][spin][kp][band] += occ[orb[1]]
 
-        for atom_group, w in projected.items():
-            for orb_group, x in w.items():
-                for spin, y in x.items():
-                    for kp, z in y.items():
-                        for band, items in z.items():
-                            projected[atom_group][orb_group][spin][kp][band] = items.tolist()
-
-        self.proj_info["orbital"] = to_sum
-        self.proj_info["orbital_input"] = orbital
+        for i in range(len(orbital)):
+            tmp = ""
+            for x in orbital[i]:
+                tmp += x[0]
+            orbital[i] = tmp
+        self.proj_info["orbital_group"] = orbital
         return projected
 
     def ktrace_convert(self, ktrace):
@@ -172,21 +168,21 @@ class Bandstructure(object):
         return False
 
     def vbm(self):
-        vbm = (-10.0, None, None)
-        for x in self.eigenvalues["band"]:
-            for i, y in enumerate(self.eigenvalues["band"][x]):
-                for j, z in enumerate(self.eigenvalues["band"][x][y]):
-                    if vbm[0] <= z[0] < self.efermi:
-                        vbm = (z[0], j, i)
+        vbm = (-10.0, None, None, None)
+        for spin, x in self.eigenvalues.items():
+            for kp, y in x.items():
+                for band, z in y.items():
+                    if vbm[0] <= z < self.efermi:
+                        vbm = (z, int(re.findall(r"[\d']+", band)[0]), int(re.findall(r"[\d']+", kp)[0]), spin)
         return vbm
 
     def cbm(self):
-        cbm = (10.0, None, None)
-        for x in self.eigenvalues["band"]:
-            for i, y in enumerate(self.eigenvalues["band"][x]):
-                for j, z in enumerate(self.eigenvalues["band"][x][y]):
-                    if cbm[0] >= z[0] > self.efermi:
-                        cbm = (z[0], j, i)
+        cbm = (10.0, None, None, None)
+        for spin, x in self.eigenvalues.items():
+            for kp, y in x.items():
+                for band, z in y.items():
+                    if cbm[0] >= z > self.efermi:
+                        cbm = (z, int(re.findall(r"[\d']+", band)[0]), int(re.findall(r"[\d']+", kp)[0]), spin)
         return cbm
 
     def gap(self):
@@ -211,6 +207,31 @@ class Bandstructure(object):
                 for band, z in y.items():
                     self.eigenvalues[spin][kp][band] -= to_shift
         self.shifted = True
+
+    def apply_window(self, ymin, ymax):
+        if ymin is None:
+            ymin = -30.0
+        if ymax is None:
+            ymax = 30.0
+
+        for spin, x in self.eigenvalues.items():
+            band_to_remove = []
+            for i in range(len(x["kpoint_1"])):
+                tmp = []
+                for kp, y in x.items():
+                    tmp.append(y["band_" + str(i + 1)])
+                if min(tmp) <= ymin:
+                    band_to_remove.append("band_" + str(i + 1))
+                elif ymax <= max(tmp):
+                    band_to_remove.append("band_" + str(i + 1))
+            for r in band_to_remove:
+                for kp, y in x.items():
+                    del(y[r])
+
+            for proj_spin, p in self.projection["ion"].items():
+                for r in band_to_remove:
+                    for kp, y in p.items():
+                        del (y[r])
 
     def get_plot_dict(self, eig, proj):
         to_plot = {"band": eig,
