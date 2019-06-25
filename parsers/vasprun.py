@@ -9,7 +9,7 @@ from handlers.structure import AtomicStructure
 
 class Vasprun(object):
 
-    def __init__(self, infile, parse_eig=True, parse_dos=True, parse_pband=True):
+    def __init__(self, infile, parse_eig=True, parse_dos=True, parse_pband=True, parse_pband_mag=False):
         self.infile = infile
         self.generator = None
         self.incar = None
@@ -22,9 +22,9 @@ class Vasprun(object):
         self.time = {}
         self.calculation = {}
 
-        self._parse_xml(self.infile, parse_eig, parse_dos, parse_pband)
+        self._parse_xml(self.infile, parse_eig, parse_dos, parse_pband, parse_pband_mag)
 
-    def _parse_xml(self, infile, parse_eig, parse_dos, parse_pband):
+    def _parse_xml(self, infile, parse_eig, parse_dos, parse_pband, parse_pband_mag):
         for event, elem in et.iterparse(infile):
             if elem.tag == "generator":
                 self.generator = self._parse_elem(elem)
@@ -72,7 +72,7 @@ class Vasprun(object):
 
                     elif elem2.tag == "projected" and parse_pband is True:
                         self.calculation["pband"] = self._parse_elem(elem2)["array"]
-                        self.proj_spin_reformat()
+                        self.proj_spin_reformat(parse_pband_mag)
 
         return
 
@@ -238,17 +238,23 @@ class Vasprun(object):
                     reformatted[spin][kp]["band_" + str(band_idx + 1)] = values[0]
         self.calculation["eigenvalues"] = reformatted
 
-    def proj_spin_reformat(self):
-        if len(self.calculation["eigenvalues"]) == 1:
+    def proj_spin_reformat(self, parse_pband_mag):
+        if len(self.calculation["pband"]["ion"]) == 1:
             self.calculation["pband"]["ion"][""] = self.calculation["pband"]["ion"].pop("spin1")
-        elif len(self.calculation["eigenvalues"]) == 2:
+        elif len(self.calculation["pband"]["ion"]) == 2:
             self.calculation["pband"]["ion"]["up"] = self.calculation["pband"]["ion"].pop("spin1")
             self.calculation["pband"]["ion"]["down"] = self.calculation["pband"]["ion"].pop("spin2")
-        elif len(self.calculation["eigenvalues"]) == 4:
-            self.calculation["pband"]["ion"]["mx"] = self.calculation["pband"]["ion"].pop("spin1")
-            self.calculation["pband"]["ion"]["my"] = self.calculation["pband"]["ion"].pop("spin2")
-            self.calculation["pband"]["ion"]["mz"] = self.calculation["pband"]["ion"].pop("spin3")
-            self.calculation["pband"]["ion"]["tot"] = self.calculation["pband"]["ion"].pop("spin4")
+        elif len(self.calculation["pband"]["ion"]) == 4:
+            if parse_pband_mag is True:
+                self.calculation["pband"]["ion"]["tot"] = self.calculation["pband"]["ion"].pop("spin1")
+                self.calculation["pband"]["ion"]["mx"] = self.calculation["pband"]["ion"].pop("spin2")
+                self.calculation["pband"]["ion"]["my"] = self.calculation["pband"]["ion"].pop("spin3")
+                self.calculation["pband"]["ion"]["mz"] = self.calculation["pband"]["ion"].pop("spin4")
+            else:
+                del(self.calculation["pband"]["ion"]["spin2"])
+                del(self.calculation["pband"]["ion"]["spin3"])
+                del(self.calculation["pband"]["ion"]["spin4"])
+                self.calculation["pband"]["ion"]["tot"] = self.calculation["pband"]["ion"].pop("spin1")
         else:
             raise KeyError("Invalid spin part!")
 
