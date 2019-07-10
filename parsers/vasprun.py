@@ -9,7 +9,8 @@ from handlers.structure import AtomicStructure
 
 class Vasprun(object):
 
-    def __init__(self, infile, parse_eig=True, parse_dos=True, parse_pband=True, parse_pband_mag=False):
+    def __init__(self, infile, parse_eig=True, parse_dos=True, parse_pband=True,
+                 parse_band_mag=False, parse_dos_mag=False):
         self.infile = infile
         self.generator = None
         self.incar = None
@@ -22,9 +23,9 @@ class Vasprun(object):
         self.time = {}
         self.calculation = {}
 
-        self._parse_xml(self.infile, parse_eig, parse_dos, parse_pband, parse_pband_mag)
+        self._parse_xml(self.infile, parse_eig, parse_dos, parse_pband, parse_band_mag, parse_dos_mag)
 
-    def _parse_xml(self, infile, parse_eig, parse_dos, parse_pband, parse_pband_mag):
+    def _parse_xml(self, infile, parse_eig, parse_dos, parse_pband, parse_band_mag, parse_dos_mag):
         for event, elem in et.iterparse(infile):
             if elem.tag == "generator":
                 self.generator = self._parse_elem(elem)
@@ -59,7 +60,7 @@ class Vasprun(object):
                         self.time[timetype] = list(map(float, elem2.text.split()))
                     elif elem2.tag == "eigenvalues" and parse_eig is True:
                         self.calculation["eigenvalues"] = self._parse_elem(elem2)["array"]
-                        self.eig_spin_reformat()
+                        self.eig_spin_reformat(parse_band_mag)
                     elif elem2.tag == "separator":
                         name = elem2.get("name")
                         self.calculation[name] = self._parse_elem(elem2)
@@ -69,10 +70,11 @@ class Vasprun(object):
                             tmp = self._parse_elem(elem2)
                             self.calculation["total_dos"] = tmp["total"].pop("array")
                             self.calculation["partial_dos"] = tmp["partial"].pop("array")
+                            self.dos_spin_reformat(parse_dos_mag)
 
                     elif elem2.tag == "projected" and parse_pband is True:
                         self.calculation["pband"] = self._parse_elem(elem2)["array"]
-                        self.proj_spin_reformat(parse_pband_mag)
+                        self.proj_spin_reformat(parse_band_mag)
 
         return
 
@@ -216,17 +218,23 @@ class Vasprun(object):
     def nested_dict(self):
         return defaultdict(self.nested_dict)
 
-    def eig_spin_reformat(self):
+    def eig_spin_reformat(self, parse_band_mag):
         if len(self.calculation["eigenvalues"]["band"]) == 1:
             self.calculation["eigenvalues"]["band"][""] = self.calculation["eigenvalues"]["band"].pop("spin_1")
         elif len(self.calculation["eigenvalues"]["band"]) == 2:
             self.calculation["eigenvalues"]["band"]["up"] = self.calculation["eigenvalues"]["band"].pop("spin_1")
             self.calculation["eigenvalues"]["band"]["down"] = self.calculation["eigenvalues"]["band"].pop("spin_2")
         elif len(self.calculation["eigenvalues"]["band"]) == 4:
-            self.calculation["eigenvalues"]["band"]["mx"] = self.calculation["eigenvalues"]["band"].pop("spin_1")
-            self.calculation["eigenvalues"]["band"]["my"] = self.calculation["eigenvalues"]["band"].pop("spin_2")
-            self.calculation["eigenvalues"]["band"]["mz"] = self.calculation["eigenvalues"]["band"].pop("spin_3")
-            self.calculation["eigenvalues"]["band"]["tot"] = self.calculation["eigenvalues"]["band"].pop("spin_4")
+            if parse_band_mag is True:
+                self.calculation["eigenvalues"]["band"]["mx"] = self.calculation["eigenvalues"]["band"].pop("spin_1")
+                self.calculation["eigenvalues"]["band"]["my"] = self.calculation["eigenvalues"]["band"].pop("spin_2")
+                self.calculation["eigenvalues"]["band"]["mz"] = self.calculation["eigenvalues"]["band"].pop("spin_3")
+                self.calculation["eigenvalues"]["band"]["tot"] = self.calculation["eigenvalues"]["band"].pop("spin_4")
+            else:
+                del(self.calculation["eigenvalues"]["band"]["spin_1"])
+                del(self.calculation["eigenvalues"]["band"]["spin_2"])
+                del(self.calculation["eigenvalues"]["band"]["spin_3"])
+                self.calculation["eigenvalues"]["band"]["tot"] = self.calculation["eigenvalues"]["band"].pop("spin_4")
         else:
             raise KeyError("Invalid spin part!")
 
@@ -257,6 +265,65 @@ class Vasprun(object):
                 self.calculation["pband"]["ion"]["tot"] = self.calculation["pband"]["ion"].pop("spin1")
         else:
             raise KeyError("Invalid spin part!")
+
+    def dos_spin_reformat(self, parse_dos_mag):
+        if len(self.calculation["total_dos"]["gridpoints"]) == 1:
+            self.calculation["total_dos"]["gridpoints"][""] = self.calculation["total_dos"]["gridpoints"].pop("spin_1")
+            for x in self.calculation["partial_dos"]["gridpoints"].keys():
+                self.calculation["partial_dos"]["gridpoints"][x][""] = self.calculation["partial_dos"]["gridpoints"][x].pop("spin_1")
+        elif len(self.calculation["total_dos"]["gridpoints"]) == 2:
+            self.calculation["total_dos"]["gridpoints"]["up"] = self.calculation["total_dos"]["gridpoints"].pop("spin_1")
+            self.calculation["total_dos"]["gridpoints"]["down"] = self.calculation["total_dos"]["gridpoints"].pop("spin_2")
+            for x in self.calculation["partial_dos"]["gridpoints"].keys():
+                self.calculation["partial_dos"]["gridpoints"][x]["up"] = self.calculation["partial_dos"]["gridpoints"][x].pop("spin_1")
+                self.calculation["partial_dos"]["gridpoints"][x]["down"] = self.calculation["partial_dos"]["gridpoints"][x].pop("spin_2")
+        elif len(self.calculation["total_dos"]["gridpoints"]) == 4:
+            if parse_dos_mag is True:
+                self.calculation["total_dos"]["gridpoints"]["mx"] = self.calculation["total_dos"]["gridpoints"].pop("spin_1")
+                self.calculation["total_dos"]["gridpoints"]["my"] = self.calculation["total_dos"]["gridpoints"].pop("spin_2")
+                self.calculation["total_dos"]["gridpoints"]["mz"] = self.calculation["total_dos"]["gridpoints"].pop("spin_3")
+                self.calculation["total_dos"]["gridpoints"]["tot"] = self.calculation["total_dos"]["gridpoints"].pop("spin_4")
+                for x in self.calculation["partial_dos"]["gridpoints"].keys():
+                    self.calculation["partial_dos"]["gridpoints"][x]["mx"] = self.calculation["partial_dos"]["gridpoints"][x].pop("spin_1")
+                    self.calculation["partial_dos"]["gridpoints"][x]["my"] = self.calculation["partial_dos"]["gridpoints"][x].pop("spin_2")
+                    self.calculation["partial_dos"]["gridpoints"][x]["mz"] = self.calculation["partial_dos"]["gridpoints"][x].pop("spin_3")
+                    self.calculation["partial_dos"]["gridpoints"][x]["tot"] = self.calculation["partial_dos"]["gridpoints"][x].pop("spin_4")
+            else:
+                del(self.calculation["total_dos"]["gridpoints"]["spin_1"])
+                del(self.calculation["total_dos"]["gridpoints"]["spin_2"])
+                del(self.calculation["total_dos"]["gridpoints"]["spin_3"])
+                self.calculation["total_dos"]["gridpoints"]["tot"] = self.calculation["total_dos"]["gridpoints"].pop("spin_4")
+                for x in self.calculation["partial_dos"]["gridpoints"].keys():
+                    del(self.calculation["partial_dos"]["gridpoints"][x]["spin_1"])
+                    del(self.calculation["partial_dos"]["gridpoints"][x]["spin_2"])
+                    del(self.calculation["partial_dos"]["gridpoints"][x]["spin_3"])
+                    self.calculation["partial_dos"]["gridpoints"][x]["tot"] = self.calculation["partial_dos"]["gridpoints"][x].pop("spin_4")
+        else:
+            raise KeyError("Invalid spin part!")
+
+        tdos = self.nested_dict()
+        for spin, x in self.calculation["total_dos"]["gridpoints"].items():
+            energy, dos, int_dos = [], [], []
+            for y in x:
+                energy.append(y[0])
+                dos.append(y[1])
+                int_dos.append(y[2])
+            tdos[spin]["energy"] = energy
+            tdos[spin]["dos"] = dos
+            tdos[spin]["int_dos"] = int_dos
+
+        self.calculation["total_dos"] = tdos
+
+        pdos = self.nested_dict()
+        for ions, x in self.calculation["partial_dos"]["gridpoints"].items():
+            for spin, y in x.items():
+                for grid, z in enumerate(y):
+                    pdos[spin]["grid_" + str(grid)][ions] = z[1:]
+
+        self.calculation["partial_dos"]["ion"] = pdos
+        self.calculation["partial_dos"]["dimension"] = ['ion', 'energy_grid', 'spin']
+        del (self.calculation["partial_dos"]["gridpoints"])
+        del(self.calculation["partial_dos"]["field"][0])
 
     def to_dic(self, title="vaspcalc", initstruc=False, parameters=False, band=False, pband=False, dos=False):
         dic = {"title": title,
