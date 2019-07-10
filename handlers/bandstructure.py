@@ -7,7 +7,7 @@ from collections import defaultdict
 class Bandstructure(object):
 
     def __init__(self, eigenvalues: dict = None, projection: dict = None, ktrace: list = None,
-                 structure: object = None, efermi: float = None, shift="vbm",
+                 structure: object = None, efermi: float = None, shift: str = "vbm", others: bool = False,
                  kweight: list = None, atom: list = None, orbital: list = None, ymin: float = None, ymax: float = None):
         self.eigenvalues = eigenvalues
         self.projection = projection
@@ -16,10 +16,6 @@ class Bandstructure(object):
         self.efermi = efermi
         self.shift = shift
         self.kweight = kweight
-        self.atom = atom
-        self.orbital = orbital
-        self.ymin = ymin
-        self.ymax = ymax
         self.metal = False
         self.shifted = False
         self.projected = {}
@@ -31,7 +27,7 @@ class Bandstructure(object):
             self.apply_window(ymin, ymax)
 
         if projection is not None:
-            self.projected = self.projection_orbital(self.projection_atom(self.projection, self.atom), self.orbital)
+            self.projected = self.projection_orbital(self.projection_atom(self.projection, atom, others), orbital, others)
 
     def nested_dict(self):
         return defaultdict(self.nested_dict)
@@ -120,10 +116,16 @@ class Bandstructure(object):
                         tmp.append(x[0])
                 if tmp:
                     to_sum.append(tmp)
-                    orbital.append(tmp)
+                    orbital.append([["others"]])
+
+        if orbital is None:
+            orbital = []
+            for x in self.projection["field"]:
+                to_sum.append([x[0]])
+                orbital.append([[x[0]]])
 
         if total is True:
-            to_sum.append([x for orb in self.projection["field"] for x in orb[0]])
+            to_sum.append([orb[0] for orb in self.projection["field"]])
             orbital.append([["total"]])
 
         for i in range(len(to_sum)):
@@ -195,7 +197,7 @@ class Bandstructure(object):
 
     def shift_band(self):
         to_shift = 0.0
-        if self.shift is None:
+        if self.shift is None or self.shift in "noneN":
             pass
         elif self.shift in "vbmVBM":
             to_shift = self.vbm()[0]
