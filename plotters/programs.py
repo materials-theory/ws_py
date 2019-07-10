@@ -3,9 +3,10 @@ import os
 
 
 class IgorPlot(object):
-    def __init__(self, outfile, options=None):
+    def __init__(self, outfile, options=None, presettype=None):
         self.outfile = outfile
         self.options = options
+        self.presettype = presettype
         self.wavelist = []
 
         with open(os.path.join(os.path.dirname(__file__), "igor_preset.json"), "r") as preset:
@@ -64,13 +65,13 @@ class IgorPlot(object):
                         out.write(xypair[0][i] + " vs " + xypair[1] + "\n")
 
             if preset:
-                for key, value in self.preset.items():
+                for key, value in self.preset[self.presettype].items():
                     if hasattr(value, "keys"):
                         for subkey, subvalues in value.items():
                             if type(subvalues) is str:
-                                out.write("X " + key + " " + subkey + " " + str(self.preset[key][subkey]) + "\n")
+                                out.write("X " + key + " " + subkey + " " + str(self.preset[self.presettype][key][subkey]) + "\n")
                             else:
-                                out.write("X " + key + " " + subkey + "=" + str(self.preset[key][subkey]) + "\n")
+                                out.write("X " + key + " " + subkey + "=" + str(self.preset[self.presettype][key][subkey]) + "\n")
                     else:
                         out.write("X " + key + " " + value + "\n")
 

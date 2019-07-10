@@ -1,23 +1,47 @@
-{"DefaultFont": "\"Times New Roman\"",
- "ModifyGraph": {"width": 255.118,
-                 "height": 340.157,
-                 "lSize": 1.5,
-                 "tick(left)": 2,
-                 "tick(bottom)": 3,
-                 "noLabel(bottom)": 2,
-                 "mirror": 1,
-                 "zero(left)": 8,
-                 "fSize": 28,
-                 "lblMargin(left)": 15,
-                 "lblMargin(bottom)": 10,
-                 "standoff": 0,
-                 "axThick": 1.5,
-                 "axisOnTop": 1,
-                 "zero(bottom)": 0,
-                 "zeroThick(left)": 2.5
-                 },
- "Label": {"left": "\"\\Z28 Energy (eV)\""
-           },
- "SetAxis": {"left": "-3, 3"
-             }
+{"band":{"DefaultFont": "\"Times New Roman\"",
+         "ModifyGraph": {"width": 255.118,
+                         "height": 340.157,
+                         "lSize": 1.5,
+                         "tick(left)": 2,
+                         "tick(bottom)": 3,
+                         "noLabel(bottom)": 2,
+                         "mirror": 1,
+                         "zero(left)": 8,
+                         "fSize": 28,
+                         "lblMargin(left)": 15,
+                         "lblMargin(bottom)": 10,
+                         "standoff": 0,
+                         "axThick": 1.5,
+                         "axisOnTop": 1,
+                         "zero(bottom)": 0,
+                         "zeroThick(left)": 2.5
+                         },
+         "Label": {"left": "\"\\Z28 Energy (eV)\""
+                         },
+         "SetAxis": {"left": "-3, 3"
+                         }
+         },
+
+  "dos":{"DefaultFont": "\"Times New Roman\"",
+         "ModifyGraph": {"width": 340.157,
+                         "height": 255.118,
+                         "lSize": 1.5,
+                         "tick(left)": 2,
+                         "tick(bottom)": 3,
+                         "noLabel(left)": 1,
+                         "mirror": 1,
+                         "fSize": 28,
+                         "lblMargin(left)": 15,
+                         "lblMargin(bottom)": 10,
+                         "standoff": 0,
+                         "axThick": 1.5,
+                         "axisOnTop": 1,
+                         "zero(bottom)": 8
+                         },
+         "Label": {"left": "\"\\Z28 DOS (arb. unit)\"",
+                   "bottom": "\"\\Z28 Energy (eV)\""
+                         },
+         "SetAxis": {"bottom": "-4, 4"
+                         }
+         }
 }
